@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "target": "ES6", // Vous pouvez ajuster cela selon votre besoin (par exemple, ES6, ES5)
+        "module": "CommonJS", // Si vous utilisez Node.js
+        "strict": true, // Active les règles strictes (optionnel mais recommandé)
+        "esModuleInterop": true, // Pour importer des modules CommonJS
+        "skipLibCheck": true, // Ignore la vérification des types dans les fichiers de bibliothèque
+        "forceConsistentCasingInFileNames": true,
+        "outDir": "./dist" // Le dossier où les fichiers compilés seront placés
+    },
+    "include": [
+        "*.ts"
+    ], // Inclut tous les fichiers .ts à la racine du projet
+    "exclude": [
+        "node_modules",
+        "dist"
+    ] // Exclut les dossiers node_modules et dist
+}
