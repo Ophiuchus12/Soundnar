@@ -1,5 +1,6 @@
 import { NavLink } from "@remix-run/react";
-import { PiMicrophoneStageFill } from "react-icons/pi";
+import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
+import { GiCompactDisc } from "react-icons/gi";
 
 export default function Sidebar() {
 
@@ -24,7 +25,7 @@ export default function Sidebar() {
                                     }`
                                 }
                             >
-                                <PiMicrophoneStageFill className="text-xl" />
+                                <GiCompactDisc className="text-xl" />
                                 Home
                             </NavLink>
                         </div>
@@ -52,7 +53,7 @@ export default function Sidebar() {
                                     }`
                                 }
                             >
-                                <PiMicrophoneStageFill className="text-xl" />
+                                <PiPlaylistBold className="text-xl" />
                                 Playlist
                             </NavLink>
                         </div>
