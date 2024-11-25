@@ -1,14 +1,14 @@
 import "../styles/index.css";
-import { getChart } from "../lib/Music"
+import { getChartAlbums } from "../lib/Music"
 import { useLoaderData } from "@remix-run/react";
-import { Album } from "../types"
+import { Album, ChartAllAlbums } from "../types"
 
 export async function loader() {
-  const chartAlbum = await getChart();
+  const chartAlbum = await getChartAlbums();
   if (!chartAlbum) throw new Error("Failed to fetch chart album");
 
   return {
-    albums: chartAlbum.albums.data,
+    albums: chartAlbum.data,
   }
 }
 
@@ -26,7 +26,7 @@ export default function Index() {
             {albums.map((album) => (
               <div key={album.id} className="text-white">
                 <p className="font-bold">{album.title}</p>
-                <p className="text-sm text-gray-400">by {album.link}</p>
+                <p className="text-sm text-gray-400">by {album.artist.name}</p>
               </div>
             ))}
           </div>

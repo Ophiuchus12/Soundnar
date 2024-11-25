@@ -9,12 +9,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getChart = getChart;
+exports.getChartAlbums = getChartAlbums;
+exports.getGenres = getGenres;
+exports.getArtistsByGenre = getArtistsByGenre;
 const musicServices_1 = require("../services/musicServices");
-function getChart(req, res) {
+function getChartAlbums(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const chartData = yield (0, musicServices_1.fetchChart)();
+            const chartData = yield (0, musicServices_1.fetchChartAlbums)();
             if (!chartData) {
                 res.status(404).json({ message: "Chart not found" });
                 return;
@@ -24,6 +26,39 @@ function getChart(req, res) {
         catch (err) {
             console.error(err);
             res.status(500).json({ message: "Erreur lors de la récuếration des données chart" });
+        }
+    });
+}
+function getGenres(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const genresData = yield (0, musicServices_1.fetchGenres)();
+            if (!genresData) {
+                res.status(404).json({ message: "Genres not found" });
+                return;
+            }
+            res.status(200).json(genresData);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Erreur lors de la récuération des données genres" });
+        }
+    });
+}
+function getArtistsByGenre(req, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const genreId = parseInt(req.params.id);
+            const artistsData = yield (0, musicServices_1.fetchArtistsByGenre)(genreId);
+            if (!artistsData) {
+                res.status(404).json({ message: "Artists in the genre not found" });
+                return;
+            }
+            res.status(200).json(artistsData);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Erreur lors de la récuération des données des artistes par genre" });
         }
     });
 }
