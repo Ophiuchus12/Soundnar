@@ -101,31 +101,45 @@ export interface Podcast {
     type: string;                 // Type de ressource (e.g., "podcast")
 }
 
-export interface chartResponse {
-    tracks: {
-        data: Track[];
-        total: number;
-    };
-    albums: {
-        data: Album[];
-        total: number;
-    };
-    artists: {
-        data: Artist[];
-        total: number;
-    };
-    playlists: {
-        data: Playlist[];
-        total: number;
-    };
-    podcasts: {
-        data: Podcast[];
-        total: number;
-    };
+export interface ChartResponseAlbums {
+    data: Album[]; // Un tableau d'objets de type Album
 }
 
-export async function getChart(): Promise<chartResponse | null> {
-    const URL = `${url}/api/music/chart`;
+export interface Album {
+    id: number;
+    title: string;
+    link: string;
+    cover: string;
+    cover_small: string;
+    cover_medium: string;
+    cover_big: string;
+    cover_xl: string;
+    md5_image: string;
+    record_type: string;
+    tracklist: string;
+    explicit_lyrics: boolean;
+    position: number;
+    artist: Artist;
+    type: string;
+}
+
+export interface Artist {
+    id: number;
+    name: string;
+    link: string;
+    picture: string;
+    picture_small: string;
+    picture_medium: string;
+    picture_big: string;
+    picture_xl: string;
+    radio: boolean;
+    tracklist: string;
+    type: string;
+}
+
+
+export async function getChartAlbums(): Promise<ChartResponseAlbums | null> {
+    const URL = `${url}/api/music/chartAll/albums`;                  //categorie genre 0 -> all
 
     try {
         const response = await fetch(URL, {
@@ -135,9 +149,77 @@ export async function getChart(): Promise<chartResponse | null> {
             },
         });
         if (!response.ok) throw new Error('Erreur dans la récupération des données chart');
-        return await response.json() as chartResponse;
+        return await response.json() as ChartResponseAlbums;
     } catch (e) {
         console.error('Erreur lors de la récupération des données chart : ', e);
+        return null;
+    }
+}
+
+
+export interface genreResponse {
+    id: number,
+    name: string,
+    picture: string,
+    picture_small: string,
+    picture_medium: string,
+    picture_big: string,
+    picture_xl: string,
+    type: string
+
+}
+
+export async function getGenre(): Promise<genreResponse | null> {
+    const URL = '${url}/api/music/genres';
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la récupération des données genre');
+        return await response.json() as genreResponse;
+    } catch (e) {
+        console.error('Erreur lors de la récupération des données genre : ', e);
+        return null;
+    }
+}
+
+export interface ArtistByGenreResponse {
+    data: Artist[]; // Tableau des artistes
+}
+
+export interface Artist {
+    id: number; // ID de l'artiste
+    name: string; // Nom de l'artiste
+    picture: string; // URL de l'image principale
+    picture_small: string; // URL de l'image petite
+    picture_medium: string; // URL de l'image moyenne
+    picture_big: string; // URL de l'image grande
+    picture_xl: string; // URL de l'image extra-large
+    radio: boolean; // Indique si la radio est disponible pour cet artiste
+    tracklist: string; // URL de la liste des pistes principales
+    type: string; // Type d'entité (ex. "artist")
+}
+
+
+
+
+export async function getArtistsByGenre(genreId: number): Promise<ArtistByGenreResponse | null> {
+    const URL = `${url}/api/music/genre/${genreId}/artists`;
+
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+        if (!response.ok) throw new Error('Erreur lors de la récupération des données artistes par genre');
+        return await response.json() as ArtistByGenreResponse;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des données artistes par genre : ', err);
         return null;
     }
 }

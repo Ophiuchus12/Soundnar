@@ -7,5 +7,7 @@ const express_1 = __importDefault(require("express"));
 const musicController_1 = require("../controllers/musicController");
 const router = express_1.default.Router();
 // getchart info
-router.get("/chart", musicController_1.getChart);
+router.get("/chartAll/albums", musicController_1.getChartAlbums);
+router.get("/genres", musicController_1.getGenres);
+router.get("/genre/:id/artists", musicController_1.getArtistsByGenre);
 exports.default = router;
