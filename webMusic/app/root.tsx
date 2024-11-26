@@ -49,7 +49,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-black h-full">
+      <body className="bg-black ">
         {!isAnimationComplete && (
           <div className="absolute top-0 left-0 right-0 flex justify-center">
             <div style={{ width: "50%" }}>{home.View}</div>

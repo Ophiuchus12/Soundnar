@@ -234,3 +234,61 @@ Tester l'API :
 
 Ainsi, en suivant ces étapes, vous aurez effectivement un serveur backend local qui peut être utilisé pour développer et tester des API, interagir 
 avec une base de données via Prisma, et servir des fonctionnalités pour votre application web.
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+La raison pour laquelle vous avez besoin de la req (requête) en paramètre de votre fonction, même si vous ne l'utilisez pas dans votre code, 
+est que c'est un comportement typique dans les applications qui utilisent des frameworks comme Express.
+
+Dans Express, les fonctions de gestion des routes (comme celles que vous écrivez pour les contrôleurs) reçoivent deux paramètres :
+
+    req — L'objet Request représente la requête HTTP reçue par le serveur. Il contient toutes les informations envoyées par le client 
+    (par exemple, les paramètres d'URL, les données de formulaire, les en-têtes, etc.). Il est souvent utilisé pour obtenir des informations liées à la requête (comme les paramètres, le corps, ou les cookies).
+
+    res — L'objet Response est utilisé pour envoyer une réponse HTTP au client. C'est via cet objet que vous renvoyez des données ou des 
+    erreurs à l'utilisateur.
+
+Pourquoi avoir req dans les paramètres alors que vous ne l'utilisez pas ?
+
+Même si vous ne l'utilisez pas dans cette fonction particulière (getChartArtists), Express exige que vous déclariez les deux paramètres, 
+req et res, pour que la fonction soit correctement traitée comme un gestionnaire de route.
+
+Dans Express, tous les gestionnaires de routes doivent respecter cette signature pour être associés à des routes et pour que le framework 
+puisse exécuter correctement la fonction. Le paramètre req est donc obligatoire, même s'il n'est pas utilisé dans le corps de votre fonction.
+Que faire si vous ne l'utilisez pas ?
+
+Si vous ne prévoyez pas d'utiliser req (la requête) dans une fonction donnée, vous pouvez soit :
+
+    Ne pas l'utiliser dans la fonction, mais le laisser dans les paramètres pour la conformité avec Express.
+    Ignorer le paramètre, mais il doit toujours être présent.
+
+Exemple :
+
+export async function getChartArtists(_: Request, res: Response): Promise<void> {
+    try {
+        const chartData = await fetchChartArtists();
+        if (!chartData) {
+            res.status(404).json({ message: "Artists not found" });
+            return;
+        }
+        res.status(200).json(chartData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récuération des données des artistes" });
+    }
+}
+
+Ici, j'ai remplacé req par un underscore _, une convention courante dans le code pour signifier que le paramètre est intentionnellement non utilisé. Cela ne change rien au fonctionnement de la fonction, mais cela indique que vous n'avez pas l'intention d'utiliser ce paramètre.
+En résumé :
+
+    La présence de req est nécessaire pour la signature des gestionnaires de route Express, même si vous ne l'utilisez pas.
+    Vous pouvez le renommer en _ si vous voulez signaler explicitement que vous ne l'utilisez pas.

@@ -10,22 +10,56 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getChartAlbums = getChartAlbums;
+exports.getChartArtists = getChartArtists;
+exports.getChartTracks = getChartTracks;
 exports.getGenres = getGenres;
 exports.getArtistsByGenre = getArtistsByGenre;
 const musicServices_1 = require("../services/musicServices");
-function getChartAlbums(req, res) {
+function getChartAlbums(_, res) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const chartData = yield (0, musicServices_1.fetchChartAlbums)();
             if (!chartData) {
-                res.status(404).json({ message: "Chart not found" });
+                res.status(404).json({ message: "Album not found" });
                 return;
             }
             res.status(200).json(chartData);
         }
         catch (err) {
             console.error(err);
-            res.status(500).json({ message: "Erreur lors de la récuếration des données chart" });
+            res.status(500).json({ message: "Erreur lors de la récuếration des données albums" });
+        }
+    });
+}
+function getChartArtists(_, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const chartData = yield (0, musicServices_1.fetchChartArtists)();
+            if (!chartData) {
+                res.status(404).json({ message: "Artists not found" });
+                return;
+            }
+            res.status(200).json(chartData);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Erreur lors de la récuération des données des artistes" });
+        }
+    });
+}
+function getChartTracks(_, res) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const chartData = yield (0, musicServices_1.fetchChartTracks)();
+            if (!chartData) {
+                res.status(404).json({ message: "Tracks not found" });
+                return;
+            }
+            res.status(200).json(chartData);
+        }
+        catch (err) {
+            console.error(err);
+            res.status(500).json({ message: "Erreur lors de la récuération des données des pistes du chart" });
         }
     });
 }
