@@ -104,6 +104,13 @@ export interface Podcast {
 export interface ChartResponseAlbums {
     data: Album[]; // Un tableau d'objets de type Album
 }
+export interface ChartResponseArtists {
+    data: Artist[]; // Un tableau d'objets de type Artist
+}
+
+export interface ChartResponseTracks {
+    data: Track[]; // Un tableau d'objets de type Track
+}
 
 export interface Album {
     id: number;
@@ -152,6 +159,40 @@ export async function getChartAlbums(): Promise<ChartResponseAlbums | null> {
         return await response.json() as ChartResponseAlbums;
     } catch (e) {
         console.error('Erreur lors de la récupération des données chart : ', e);
+        return null;
+    }
+}
+
+export async function getChartArtists(): Promise<ChartResponseArtists | null> {
+    const URL = `${url}/api/music/chartAll/artists`;                  //categorie genre 0 -> all
+    try {
+        const reponse = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!reponse.ok) throw new Error('Erreur dans la récupération des données chart');
+        return await reponse.json() as ChartResponseArtists;
+    } catch (e) {
+        console.error('Erreur lors de la récupération des données chart : ', e);
+        return null;
+    }
+}
+
+export async function getChartTracks(): Promise<ChartResponseTracks | null> {
+    const URL = `${url}/api/music/chartAll/tracks`;
+    try {
+        const reponse = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        if (!reponse.ok) throw new Error('Erreur dans la récupération des données chart');
+        return await reponse.json() as ChartResponseTracks;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des données chart : ', err);
         return null;
     }
 }

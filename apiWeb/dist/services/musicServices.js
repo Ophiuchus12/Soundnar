@@ -13,6 +13,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchChartAlbums = fetchChartAlbums;
+exports.fetchChartArtists = fetchChartArtists;
+exports.fetchChartTracks = fetchChartTracks;
 exports.fetchGenres = fetchGenres;
 exports.fetchArtistsByGenre = fetchArtistsByGenre;
 const axios_1 = __importDefault(require("axios"));
@@ -20,6 +22,32 @@ function fetchChartAlbums() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const url = "https://api.deezer.com/chart/0/albums";
+            const response = yield axios_1.default.get(url);
+            return response.data;
+        }
+        catch (err) {
+            console.error(err);
+            return null;
+        }
+    });
+}
+function fetchChartArtists() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const url = "https://api.deezer.com/chart/0/artists";
+            const response = yield axios_1.default.get(url);
+            return response.data;
+        }
+        catch (err) {
+            console.error(err);
+            return null;
+        }
+    });
+}
+function fetchChartTracks() {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const url = "https://api.deezer.com/chart/0/tracks";
             const response = yield axios_1.default.get(url);
             return response.data;
         }

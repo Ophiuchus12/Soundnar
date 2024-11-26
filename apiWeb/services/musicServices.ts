@@ -1,7 +1,15 @@
 import axios from "axios";
 
-export type chartResponse = {
+export type chartAlbumResponse = {
     data: Album[];
+}
+
+export type chartArtistResponse = {
+    data: Artist[];
+}
+
+export type chartTracksresponse = {
+    data: Track[];
 }
 
 export interface Album {
@@ -36,7 +44,24 @@ export interface Artist {
     type: string;
 }
 
-
+export interface Track {
+    id: number;
+    title: string;
+    title_short: string;
+    title_version: string;
+    link: string;
+    duration: number;
+    rank: number;
+    explicit_lyrics: boolean;
+    explicit_content_lyrics: number;
+    explicit_content_cover: number;
+    preview: string;
+    md5_image: string;
+    position: number;
+    artist: Artist; // Référence à l'interface `Artist`
+    album: Album;   // Référence à l'interface `Album`
+    type: string;   // e.g., "track"
+}
 
 
 
@@ -44,13 +69,35 @@ export interface Artist {
 export async function fetchChartAlbums() {
     try {
         const url = "https://api.deezer.com/chart/0/albums";
-        const response = await axios.get<chartResponse>(url);
+        const response = await axios.get<chartAlbumResponse>(url);
         return response.data;
     } catch (err) {
         console.error(err);
         return null;
     }
 
+}
+
+export async function fetchChartArtists() {
+    try {
+        const url = "https://api.deezer.com/chart/0/artists";
+        const response = await axios.get<chartArtistResponse>(url);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function fetchChartTracks() {
+    try {
+        const url = "https://api.deezer.com/chart/0/tracks";
+        const response = await axios.get<chartTracksresponse>(url);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 }
 
 export interface genreResponse {

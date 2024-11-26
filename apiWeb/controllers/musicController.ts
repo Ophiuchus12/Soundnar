@@ -1,19 +1,48 @@
 import { Request, Response } from "express";
-import { fetchChartAlbums, fetchGenres, fetchArtistsByGenre } from "../services/musicServices";
+import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks } from "../services/musicServices";
 
-export async function getChartAlbums(req: Request, res: Response): Promise<void> {
+export async function getChartAlbums(_: Request, res: Response): Promise<void> {
     try {
         const chartData = await fetchChartAlbums();
         if (!chartData) {
-            res.status(404).json({ message: "Chart not found" });
+            res.status(404).json({ message: "Album not found" });
             return;
         }
         res.status(200).json(chartData);
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Erreur lors de la récuếration des données chart" });
+        res.status(500).json({ message: "Erreur lors de la récuếration des données albums" });
 
 
+    }
+}
+
+
+export async function getChartArtists(_: Request, res: Response): Promise<void> {
+    try {
+        const chartData = await fetchChartArtists();
+        if (!chartData) {
+            res.status(404).json({ message: "Artists not found" });
+            return;
+        }
+        res.status(200).json(chartData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récuération des données des artistes" });
+    }
+}
+
+export async function getChartTracks(_: Request, res: Response): Promise<void> {
+    try {
+        const chartData = await fetchChartTracks();
+        if (!chartData) {
+            res.status(404).json({ message: "Tracks not found" });
+            return;
+        }
+        res.status(200).json(chartData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récuération des données des pistes du chart" });
     }
 }
 

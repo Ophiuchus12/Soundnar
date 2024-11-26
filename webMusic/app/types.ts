@@ -20,7 +20,7 @@ export type Album = {
     type: string;
 }
 
-export interface Artist {
+export type Artist = {
     id: number;
     name: string;
     link: string;
@@ -31,7 +31,27 @@ export interface Artist {
     picture_xl: string;
     radio: boolean;
     tracklist: string;
+    position: number;
     type: string;
 }
 
+
+export type Track = {
+    id: number;
+    title: string;
+    title_short: string;
+    title_version: string;
+    link: string;
+    duration: number;
+    rank: number;
+    explicit_lyrics: boolean;
+    explicit_content_lyrics: number;
+    explicit_content_cover: number;
+    preview: string;
+    md5_image: string;
+    position: number;
+    artist: Artist; // Référence à l'interface `Artist`
+    album: Album;   // Référence à l'interface `Album`
+    type: string;   // e.g., "track"
+}
 
