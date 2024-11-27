@@ -1,0 +1,19 @@
+- GET: http://localhost:3000/api/music/chartAll/albums
+  tests:
+    - status: 200
+
+- GET: http://localhost:3000/api/music/genres
+  tests:
+    - status: 200
+
+- GET: http://localhost:3000/api/music/genre/12/artists
+  tests:
+    - status: 200
+
+- GET: http://localhost:3000/api/music/chartAll/artists
+  tests:
+    - status: 200
+
+- GET: http://localhost:3000/api/music/chartAll/tracks
+  tests:
+  - status: 200
