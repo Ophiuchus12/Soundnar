@@ -199,6 +199,11 @@ export async function getChartTracks(): Promise<ChartResponseTracks | null> {
 
 
 export interface genreResponse {
+    data: genre[],
+
+}
+
+export interface genre {
     id: number,
     name: string,
     picture: string,
@@ -207,11 +212,10 @@ export interface genreResponse {
     picture_big: string,
     picture_xl: string,
     type: string
-
 }
 
 export async function getGenre(): Promise<genreResponse | null> {
-    const URL = '${url}/api/music/genres';
+    const URL = `${url}/api/music/genres`;
     try {
         const response = await fetch(URL, {
             method: 'GET',
@@ -264,3 +268,5 @@ export async function getArtistsByGenre(genreId: number): Promise<ArtistByGenreR
         return null;
     }
 }
+
+

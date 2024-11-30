@@ -31,17 +31,16 @@ export interface Album {
 }
 
 export interface Artist {
-    id: number;
-    name: string;
-    link: string;
-    picture: string;
-    picture_small: string;
-    picture_medium: string;
-    picture_big: string;
-    picture_xl: string;
-    radio: boolean;
-    tracklist: string;
-    type: string;
+    id: number; // ID de l'artiste
+    name: string; // Nom de l'artiste
+    picture: string; // URL de l'image principale
+    picture_small: string; // URL de l'image petite
+    picture_medium: string; // URL de l'image moyenne
+    picture_big: string; // URL de l'image grande
+    picture_xl: string; // URL de l'image extra-large
+    radio: boolean; // Indique si la radio est disponible pour cet artiste
+    tracklist: string; // URL de la liste des pistes principales
+    type: string; // Type d'entité (ex. "artist")
 }
 
 export interface Track {
@@ -101,6 +100,11 @@ export async function fetchChartTracks() {
 }
 
 export interface genreResponse {
+    data: genre[],
+
+}
+
+export interface genre {
     id: number,
     name: string,
     picture: string,
@@ -124,7 +128,7 @@ export async function fetchGenres() {
 
 
 export interface artistsByGenreResponse {
-    data: string[];
+    data: Artist[];
 }
 
 export async function fetchArtistsByGenre(genreId: number) {

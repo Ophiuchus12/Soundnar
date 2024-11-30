@@ -51,14 +51,14 @@ export default function Index() {
           ))}
         </div>
       </div>
-      {/* Liste des albums */}
+      {/* Liste des artists */}
       <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
         <h2 className="text-white text-3xl font-semibold text-center mb-6">Top Artists</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {artists.map((artist) => (
             <div key={artist.id} className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300">
               <img
-                className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-[#7600be] mb-2"
+                className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-white mb-2"
                 src={artist.picture_medium}
                 alt={artist.name}
               />
@@ -68,7 +68,7 @@ export default function Index() {
           ))}
         </div>
       </div>
-      {/* Liste des albums */}
+      {/* Liste des tarcks */}
       <div className="w-full bg-black p-6 rounded-lg mb-10">
         <h2 className="text-white text-3xl font-semibold text-center mb-8">Top Tracks</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
