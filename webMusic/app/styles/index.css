@@ -29,3 +29,25 @@
 .fade-in {
   animation: fadeIn 3s ease-in-out forwards;
 }
+
+
+
+@keyframes slideTop {
+  0% {
+    transform: translateX(+100%);
+    /* Position en dehors de l'écran */
+    opacity: 0;
+    /* Optionnel : fade-in pendant le slide */
+  }
+
+  100% {
+    transform: translateX(0);
+    /* Position finale */
+    opacity: 1;
+  }
+}
+
+.slide-top {
+  animation: slideTop 1s ease-in-out forwards;
+  /* Animation fluide et direction finale */
+}

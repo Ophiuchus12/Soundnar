@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getGenre, getArtistsByGenre } from '../lib/Music';
 import { useLoaderData } from '@remix-run/react';
-import { genre, Artist } from '../types';
+import { Genre, Artist } from '../types';
 import "../styles/index.css";
 import SearchBar from '~/components/SearchBar';
 
@@ -11,7 +11,7 @@ export async function loader() {
 }
 
 export default function Artists() {
-    const { genres } = useLoaderData<{ genres: genre[] }>();
+    const { genres } = useLoaderData<{ genres: Genre[] }>();
     const [idGenres, setIdGenres] = useState<number>(0); // Initialiser avec "Tout" (id = 0)
     const [artists, setArtists] = useState<Artist[]>([]);
     const [loading, setLoading] = useState<boolean>(false); // Gestion du chargement
