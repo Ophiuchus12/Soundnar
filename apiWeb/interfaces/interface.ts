@@ -63,11 +63,11 @@ export interface Track {
 
 
 export interface genreResponse {
-    data: genre[],
+    data: Genre[],
 
 }
 
-export interface genre {
+export interface Genre {
     id: number,
     name: string,
     picture: string,
@@ -84,34 +84,38 @@ export interface artistsByGenreResponse {
 
 
 export interface AlbumDetail {
-    id: number; // Identifiant unique de l'album
-    title: string; // Titre de l'album
-    upc: string; // Code-barre de l'album
-    link: string; // Lien vers l'album sur Deezer
-    share: string; // Lien de partage de l'album
-    cover: string; // Lien vers l'image de couverture
-    cover_small: string; // Lien vers l'image de couverture (petite taille)
-    cover_medium: string; // Lien vers l'image de couverture (taille moyenne)
-    cover_big: string; // Lien vers l'image de couverture (grande taille)
-    cover_xl: string; // Lien vers l'image de couverture (très grande taille)
-    md5_image: string; // Hash MD5 de l'image de couverture
-    genre_id: number; // Identifiant du genre principal
-    genres: GenreData; // Détails des genres
-    label: string; // Label de l'album
-    nb_tracks: number; // Nombre de pistes dans l'album
-    duration: number; // Durée totale de l'album en secondes
-    fans: number; // Nombre de fans de l'album
-    release_date: string; // Date de sortie de l'album
-    record_type: string; // Type de l'enregistrement (e.g., album, single)
-    available: boolean; // Indique si l'album est disponible
-    tracklist: string; // Lien vers la liste des pistes
-    explicit_lyrics: boolean; // Indique si l'album contient des paroles explicites
-    explicit_content_lyrics: number; // Niveau de contenu explicite des paroles (échelle)
-    explicit_content_cover: number; // Niveau de contenu explicite de la couverture (échelle)
-    contributors: Contributor[]; // Liste des contributeurs
-    artist: Artist; // Détails de l'artiste principal
-    type: string; // Type de ressource (e.g., "album")
-    tracks: Track[]; // Détails des pistes
+    id: string;
+    title: string;
+    upc: string;
+    link: string;
+    share: string;
+    cover: string;
+    cover_small: string;
+    cover_medium: string;
+    cover_big: string;
+    cover_xl: string;
+    md5_image: string;
+    genre_id: number;
+    genres: {
+        data: Genre[];
+    };
+    label: string;
+    nb_tracks: number;
+    duration: number;
+    fans: number;
+    release_date: string;
+    record_type: string;
+    available: boolean;
+    tracklist: string;
+    explicit_lyrics: boolean;
+    explicit_content_lyrics: number;
+    explicit_content_cover: number;
+    contributors: Contributor[];
+    artist: Artist;
+    type: string;
+    tracks: {
+        data: Track[];
+    };
 }
 
 export interface GenreData {
