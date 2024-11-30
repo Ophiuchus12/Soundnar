@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { getGenre, getArtistsByGenre } from '../lib/Music';
 import { useLoaderData } from '@remix-run/react';
-import { Genre, Artist } from '../types';
+import { genre, Artist } from '../types';
 import "../styles/index.css";
+import SearchBar from '~/components/SearchBar';
 
 export async function loader() {
     const allGenres = await getGenre();
@@ -10,10 +11,11 @@ export async function loader() {
 }
 
 export default function Artists() {
-    const { genres } = useLoaderData<{ genres: Genre[] }>();
+    const { genres } = useLoaderData<{ genres: genre[] }>();
     const [idGenres, setIdGenres] = useState<number>(0); // Initialiser avec "Tout" (id = 0)
     const [artists, setArtists] = useState<Artist[]>([]);
     const [loading, setLoading] = useState<boolean>(false); // Gestion du chargement
+    const [artistSearch, setArtistSearch] = useState("");
 
     const searchArtistByGenre = async (idGenre: number) => {
         try {
@@ -39,6 +41,7 @@ export default function Artists() {
 
     return (
         <div className="container mx-auto px-4">
+            <SearchBar value={artistSearch} onChange={setArtistSearch} />
             {/* Dropdown des genres et bouton de soumission */}
             <div className="flex justify-center items-center mt-6">
                 <label className="relative mr-4">

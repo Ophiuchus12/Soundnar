@@ -1,6 +1,6 @@
 import "../styles/index.css";
 import { getChartAlbums, getChartArtists, getChartTracks } from "../lib/Music"
-import { useLoaderData } from "@remix-run/react";
+import { redirect, useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, ChartAllAlbums, Track } from "../types"
 import { useState } from "react";
 import SearchBar from "../components/SearchBar";
@@ -28,6 +28,11 @@ export default function Index() {
   const { artists } = useLoaderData<{ artists: Artist[] }>();
   const { tracks } = useLoaderData<{ tracks: Track[] }>();
   const [artistSearch, setArtistSearch] = useState("");
+  const navigate = useNavigate();
+
+  const handleClickAlbum = (idAlbum: number) => {
+    navigate(`/albumDetails?album=${idAlbum}`)
+  };
 
   return (
     <div className="w-full h-full min-h-screen flex flex-col items-center justify-center bg-black">
@@ -39,7 +44,7 @@ export default function Index() {
         <h2 className="text-white text-3xl font-semibold text-center mb-6">Top Albums</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {albums.map((album) => (
-            <div key={album.id} className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300">
+            <div key={album.id} className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300" onClick={() => handleClickAlbum(album.id)}>
               <img
                 className="w-50 h-50 object-cover rounded-lg border-2 border-opacity-40 border-white mb-2"
                 src={album.cover_medium}
