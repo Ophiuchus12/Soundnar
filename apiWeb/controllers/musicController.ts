@@ -61,9 +61,10 @@ export async function getGenres(req: Request, res: Response): Promise<void> {
     }
 }
 
-export async function getArtistsByGenre(req: Request, res: Response): Promise<void> {
+export async function getArtistsGenre(req: Request, res: Response): Promise<void> {
     try {
         const genreId = parseInt(req.params.id);
+        console.log(`genreId: ${genreId}`);
         const artistsData = await fetchArtistsByGenre(genreId);
         if (!artistsData) {
             res.status(404).json({ message: "Artists in the genre not found" });
