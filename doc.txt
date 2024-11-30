@@ -292,3 +292,21 @@ En résumé :
 
     La présence de req est nécessaire pour la signature des gestionnaires de route Express, même si vous ne l'utilisez pas.
     Vous pouvez le renommer en _ si vous voulez signaler explicitement que vous ne l'utilisez pas.
+
+///////////
+
+L'ajout de response.data est crucial pour correctement traiter les réponses des appels HTTP effectués avec Axios. Voici une explication détaillée :
+1. Fonctionnement de axios.get
+
+Lorsque vous utilisez axios.get(url), Axios retourne une réponse contenant plusieurs informations dans un objet. Cet objet a généralement la structure suivante :
+
+{
+    data: any;         // Les données renvoyées par le serveur (payload)
+    status: number;    // Code de statut HTTP (e.g., 200, 404)
+    statusText: string; // Texte associé au code de statut (e.g., "OK")
+    headers: any;      // En-têtes HTTP de la réponse
+    config: any;       // Configuration de la requête initiale
+    request: any;      // Objet de la requête HTTP (détails internes)
+}
+
+Le champ data contient les données utiles renvoyées par le serveur, dans ce cas, l'album retourné par l'API Deezer.
