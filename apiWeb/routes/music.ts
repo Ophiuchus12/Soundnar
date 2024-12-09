@@ -1,5 +1,5 @@
 import express from "express";
-import { getChartAlbums, getGenres, getArtistsGenre, getChartArtists, getChartTracks, getSingleAlbum } from "../controllers/musicController";
+import { getChartAlbums, getGenres, getArtistsGenre, getChartArtists, getChartTracks, getSingleAlbum, getSingleArtist, getSingleArtistAlbums } from "../controllers/musicController";
 
 const router = express.Router();
 
@@ -11,5 +11,8 @@ router.get("/chartAll/tracks", getChartTracks)
 router.get("/genres", getGenres)
 router.get("/genre/:id/artists", getArtistsGenre);
 router.get("/album/:idAlbum", getSingleAlbum);
+router.get("/artist/:idArtist", getSingleArtist);
+router.get("/artist/:idArtist/albums", getSingleArtistAlbums);
+
 
 export default router;

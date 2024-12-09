@@ -4,6 +4,7 @@ import { redirect, useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, ChartAllAlbums, Track } from "../types"
 import { useState } from "react";
 import SearchBar from "../components/SearchBar";
+import { GiMusicSpell } from "react-icons/gi";
 
 
 export async function loader() {
@@ -28,10 +29,22 @@ export default function Index() {
   const { artists } = useLoaderData<{ artists: Artist[] }>();
   const { tracks } = useLoaderData<{ tracks: Track[] }>();
   const [artistSearch, setArtistSearch] = useState("");
+  const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   const handleClickAlbum = (idAlbum: number) => {
     navigate(`/albumDetails?album=${idAlbum}`)
+  };
+
+  const handleClickArtist = (idArtist: number) => {
+    console.log('Navigating to artist:', idArtist);
+    navigate(`/artistDetails/${idArtist}`);
+  };
+
+
+  const handlePlayClick = (trackId: number) => {
+    // Si le morceau cliqué est déjà en lecture, on l'arrête
+    setPlayingTrackId(playingTrackId === trackId ? null : trackId);
   };
 
   return (
@@ -61,7 +74,7 @@ export default function Index() {
         <h2 className="text-white text-3xl font-semibold text-center mb-6">Top Artists</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
           {artists.map((artist) => (
-            <div key={artist.id} className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300">
+            <div key={artist.id} className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300" onClick={() => handleClickArtist(artist.id)}>
               <img
                 className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-white mb-2"
                 src={artist.picture_medium}
@@ -76,7 +89,7 @@ export default function Index() {
       {/* Liste des tarcks */}
       <div className="w-full bg-black p-6 rounded-lg mb-10">
         <h2 className="text-white text-3xl font-semibold text-center mb-8">Top Tracks</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
           {tracks.map((track) => (
             <div
               key={track.id}
@@ -91,26 +104,34 @@ export default function Index() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               </div>
 
-              <div className="space-y-2">
+              {/* Titre et bouton sur la même ligne */}
+              <div className="flex items-center justify-between space-x-4">
                 <h3 className="font-bold text-white text-lg truncate">{track.title}</h3>
-                <p className="text-gray-400 text-sm truncate">by {track.artist.name}</p>
-
-                <div className="mt-4">
-                  <audio
-                    className="w-full h-8 audio-player"
-                    controls
-                  >
-                    <source src={track.preview} type="audio/mpeg" />
-                    Your browser does not support the audio element.
-                  </audio>
-                </div>
+                <button
+                  onClick={() => handlePlayClick(track.id)}
+                  className="text-white text-3xl p-2 rounded-full bg-[#6a00ab] hover:bg-[#3b1d79] transition-all"
+                  aria-label="Lire le morceau"
+                >
+                  <GiMusicSpell />
+                </button>
               </div>
+
+              <p className="text-gray-400 text-sm truncate mt-2">by {track.artist.name}</p>
+
+              {/* Rendre conditionnellement le lecteur audio pour le morceau sélectionné */}
+              {playingTrackId === track.id && (
+                <audio className="hidden" controls autoPlay>
+                  <source src={track.preview} type="audio/mpeg" />
+                  Votre navigateur ne supporte pas l'élément audio.
+                </audio>
+              )}
             </div>
           ))}
         </div>
       </div>
 
-    </div>
+
+    </div >
   );
 
 }
