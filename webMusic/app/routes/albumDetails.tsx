@@ -16,7 +16,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 export default function AlbumDetails() {
 
     const { albumId } = useLoaderData<{ albumId: string }>();
-    const albumIdNumber = Number(albumId);  // Conversion en nombre
     const [albumDetails, setAlbumDetails] = useState<AlbumDetail | null>(null);
     const [tracks, setTracks] = useState<Track[] | null>(null);
     const [modal, setModal] = useState(false);
@@ -59,48 +58,57 @@ export default function AlbumDetails() {
         <div className='w-full h-full min-h-screen flex flex-col mt-10 bg-black fade-in'>
             {/* Modal */}
             {modal && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 slide-top">
-                    <div className="w-full max-w-lg bg-opacity-80 p-6 bg-gray-500 rounded-lg shadow-xl transform transition-all duration-300 ease-in-out">
-                        {/* Image de l'album */}
-                        <img
-                            className="h-full w-full object-cover rounded-lg mb-4"
-                            src={albumDetails?.cover_xl}
-                            alt={albumDetails?.title}
-                        />
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50 slide-top">
+                    <div className="w-full max-w-xl transform rounded-2xl bg-gray-900 p-6 shadow-2xl transition-all">
+                        <div className="relative aspect-square overflow-hidden rounded-xl">
+                            <img
+                                className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                                src={albumDetails?.cover_xl}
+                                alt={albumDetails?.title}
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                        </div>
 
-                        {/* Titre de l'album */}
-                        <h2 className="mt-4 text-3xl text-white font-semibold">Album title : {albumDetails?.title}</h2>
+                        <div className="mt-6 space-y-4">
+                            <h2 className="bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
+                                {albumDetails?.title}
+                            </h2>
+                            <div className="space-y-2 text-gray-300">
+                                <p className="text-lg">Artist: {albumDetails?.artist.name}</p>
+                                <p>Duration: {formatDuration(albumDetails?.duration || 0)}</p>
+                                <p>Tracks: {albumDetails?.nb_tracks}</p>
+                                <p>Label: {albumDetails?.label}</p>
+                            </div>
 
-                        {/* Nom de l'artiste */}
-                        <h3 className="mt-2 text-lg text-gray-400">Artist : {albumDetails?.artist.name}</h3>
+                            {albumDetails?.contributors && albumDetails.contributors.length > 1 && (
+                                <div className="space-y-1">
+                                    <h3 className="text-lg font-semibold text-white">Contributors</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {albumDetails.contributors.map((contributor) => (
+                                            <span
+                                                key={contributor.id}
+                                                className="rounded-full bg-purple-900/50 px-3 py-1 text-sm text-white"
+                                            >
+                                                {contributor.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
 
-                        {/* Description (si applicable) */}
-                        {albumDetails?.duration && (
-                            <h3 className="mt-2 text-lg text-gray-400">
-                                Duration: {formatDuration(albumDetails.duration)}
-                            </h3>
-                        )}
-
-
-                        <h3 className="mt-2 text-lg text-gray-400">Number of tracks : {albumDetails?.nb_tracks}</h3>
-
-                        <h3 className="mt-2 text-lg text-gray-400">Label : {albumDetails?.label}</h3>
-
-
-                        {/* Bouton de fermeture */}
-                        <button
-                            className="mt-6 w-full bg-[#7600be] hover:bg-[#6a00ab] text-white font-semibold py-2 px-4 rounded-full shadow-md transition duration-300 ease-in-out transform hover:scale-105"
-                            onClick={() => setModal(false)}
-                        >
-                            Fermer
-                        </button>
+                            <button
+                                className="mt-6 w-full rounded-full bg-purple-600 px-6 py-3 font-semibold text-white transition-all hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                                onClick={() => setModal(false)}
+                            >
+                                Close
+                            </button>
+                        </div>
                     </div>
                 </div>
-
             )}
             <div className=" flex ml-8">
                 <button
-                    onClick={() => navigate("/")}
+                    onClick={() => navigate(-1)}
                     className=" text-white text-3xl p-2 rounded-full bg-[#6a00ab] hover:bg-[#3b1d79] transition-all z-40"
                     aria-label="Go back to home"
                 >
@@ -109,11 +117,31 @@ export default function AlbumDetails() {
 
             </div>
             {/* Affichage de l'album et de l'artiste */}
-            <div className="flex items-center justify-center mb-10">
-                <div className='' onClick={() => setModal(true)}>
-                    <img className="h-80 w-100 rounded-lg shadow-lg" src={albumDetails?.cover_big} alt="Album Cover" />
-                    <h1 className="text-white text-3xl mt-4">{albumDetails?.title}</h1>
-                    <h2 className="text-gray-400 text-xl">{albumDetails?.artist.name}</h2>
+            <div className="relative px-6 pt-24">
+                <div className="mx-auto max-w-6xl">
+                    <div className="flex flex-col items-center space-y-6">
+                        <button
+                            onClick={() => setModal(true)}
+                            className="group relative rounded-xl transition-transform hover:scale-105 focus:outline-none"
+                        >
+                            <div className="absolute -inset-4 animate-pulse rounded-2xl bg-gradient-to-r from-purple-600 to-purple-900 opacity-75 blur-lg transition-all group-hover:opacity-100" />
+                            <div className="relative aspect-square w-64 overflow-hidden rounded-xl border-2 border-purple-500/50">
+                                <img
+                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                    src={albumDetails?.cover_big}
+                                    alt="Album Cover"
+                                />
+                            </div>
+                        </button>
+                        <div className="text-center">
+                            <h1 className="bg-gradient-to-r from-purple-400 via-purple-300 to-purple-500 bg-clip-text text-4xl font-bold text-transparent">
+                                {albumDetails?.title}
+                            </h1>
+                            <h2 className="mt-2 text-xl text-gray-400">
+                                {albumDetails?.artist.name}
+                            </h2>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -129,10 +157,13 @@ export default function AlbumDetails() {
 
                             <button
                                 onClick={() => handlePlayClick(track.id)}
-                                className="text-white text-3xl p-2 rounded-full bg-[#6a00ab] hover:bg-[#3b1d79] transition-all z-40"
-                                aria-label="Lire le morceau"
+                                className={`rounded-full p-2 transition-all ${playingTrackId === track.id
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
+                                    }`}
+                                aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
                             >
-                                <GiMusicSpell />
+                                <GiMusicSpell className="h-5 w-5" />
                             </button>
 
                             {/* Rendre conditionnellement le lecteur audio pour le morceau sélectionné */}

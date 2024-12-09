@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks, fetchAlbum } from "../services/musicServices";
+import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks, fetchAlbum, fetchArtist, fetchArtistAlbum } from "../services/musicServices";
 
 export async function getChartAlbums(_: Request, res: Response): Promise<void> {
     try {
@@ -89,5 +89,36 @@ export async function getSingleAlbum(req: Request, res: Response): Promise<void>
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Erreur lors de la récuération des données de l'album" });
+    }
+}
+
+
+export async function getSingleArtist(req: Request, res: Response): Promise<void> {
+    try {
+        const artistId = parseInt(req.params.idArtist);
+        const artistData = await fetchArtist(artistId);
+        if (!artistData) {
+            res.status(404).json({ message: "Artist not found" });
+            return;
+        }
+        res.status(200).json(artistData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récuération des données de l'artiste" });
+    }
+}
+
+export async function getSingleArtistAlbums(req: Request, res: Response): Promise<void> {
+    try {
+        const artistId = parseInt(req.params.idArtist);
+        const artistData = await fetchArtistAlbum(artistId);
+        if (!artistData) {
+            res.status(404).json({ message: "Artist Album not found" });
+            return;
+        }
+        res.status(200).json(artistData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récuération des données de l'artiste" });
     }
 }

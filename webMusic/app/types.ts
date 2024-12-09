@@ -196,3 +196,46 @@ export interface Podcast {
     picture_xl: string;           // URL de l'image en très grande taille (1000x1000)
     type: string;                 // Type de ressource (e.g., "podcast")
 }
+
+export interface ArtistDetail {
+    id: number;
+    name: string;
+    link: string;
+    share: string;
+    picture: string;
+    picture_small: string;
+    picture_medium: string;
+    picture_big: string;
+    picture_xl: string;
+    nb_album: number;
+    nb_fan: number;
+    radio: boolean;
+    tracklist: string;
+}
+
+export interface ArtistDetailAlbumList {
+    data: ArtistDetailAlbum[];
+}
+
+
+export interface ArtistDetailAlbum {
+
+    id: number;
+    title: string;
+    link: string;
+    share: string;
+    cover: string;
+    cover_small: string;
+    cover_medium: string;
+    cover_big: string;
+    cover_xl: string;
+    md5_image: string;
+    genre_id: number;
+    fans: number;
+    release_date: string;
+    record_type: string;
+    tracklist: string;
+    explicit_lyrics: boolean;
+    type: string;
+
+}
