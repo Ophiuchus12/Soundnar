@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { getGenre, getArtistsByGenre } from '../lib/Music';
-import { useLoaderData } from '@remix-run/react';
+import { useLoaderData, useNavigate } from '@remix-run/react';
 import { Genre, Artist } from '../types';
 import "../styles/index.css";
 import SearchBar from '~/components/SearchBar';
+
+
 
 export async function loader() {
     const allGenres = await getGenre();
@@ -16,6 +18,7 @@ export default function Artists() {
     const [artists, setArtists] = useState<Artist[]>([]);
     const [loading, setLoading] = useState<boolean>(false); // Gestion du chargement
     const [artistSearch, setArtistSearch] = useState("");
+    const navigate = useNavigate();
 
     const searchArtistByGenre = async (idGenre: number) => {
         try {
@@ -39,8 +42,12 @@ export default function Artists() {
         searchArtistByGenre(idGenres);
     }, [idGenres]); // Effectuer la recherche dès que le genre est modifié
 
+    const handleArtist = (idArtist: number) => {
+        navigate(`/artistDetails/${idArtist}`);
+    }
+
     return (
-        <div className="container mx-auto px-4">
+        <div className="mx-auto px-4 fade-in">
             <SearchBar value={artistSearch} onChange={setArtistSearch} />
             {/* Dropdown des genres et bouton de soumission */}
             <div className="flex justify-center items-center mt-6">
@@ -71,7 +78,8 @@ export default function Artists() {
                     artists.map((artist) => (
                         <div
                             key={artist.id}
-                            className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105 fade-in"
+                            className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105 "
+                            onClick={() => handleArtist(artist.id)}
                         >
                             <img
                                 src={artist.picture_medium}
