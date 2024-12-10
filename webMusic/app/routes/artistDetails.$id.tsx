@@ -3,7 +3,7 @@ import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
 import { FaArrowLeft } from 'react-icons/fa';
 import { getArtist, getArtistAlbums } from '~/lib/Music';
-import { ArtistDetail, ArtistDetailAlbum, ArtistDetailAlbumList } from '~/types';
+import { ArtistDetail, ArtistDetailAlbumList } from '~/types';
 
 export async function loader({ params }: LoaderFunctionArgs) {
     const { id } = params;
@@ -34,7 +34,7 @@ export default function ArtistDetails() {
     const navigate = useNavigate();
 
     const handleClickAlbum = (idAlbum: number) => {
-        navigate(`/albumDetails?album=${idAlbum}`)
+        navigate(`/albumDetails/${idAlbum}`)
     };
 
     return (
@@ -50,7 +50,7 @@ export default function ArtistDetails() {
                 </button>
 
             </div>
-            <div className="relative px-6 pt-24">
+            <div className="relative px-6 pt-10">
                 <div className="mx-auto max-w-6xl">
                     <div className="flex flex-col items-center space-y-6">
                         {/* Artist Image */}
@@ -75,16 +75,6 @@ export default function ArtistDetails() {
                             </p>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Description Section */}
-            <div className="mx-auto max-w-4xl px-6 py-12">
-                <h2 className="mb-4 text-2xl font-bold text-white">About</h2>
-                <div className="rounded-xl bg-gray-900/50 p-6 backdrop-blur-sm">
-                    <p className="text-gray-300">
-                        Description de l'artist ici ârocur vbefncebz bncizheubcz cbhbcurbebcvuh al P ZFNP YEZKENB vrevie ivu
-                    </p>
                 </div>
             </div>
 
@@ -113,6 +103,9 @@ export default function ArtistDetails() {
                             <h3 className="mt-3 truncate text-sm font-medium text-gray-200 transition-colors group-hover:text-white">
                                 {album.title}
                             </h3>
+                            <p className="text-white">
+                                {new Date(album.release_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })}
+                            </p>
                         </button>
                     ))}
                 </div>

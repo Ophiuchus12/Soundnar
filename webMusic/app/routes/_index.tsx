@@ -33,7 +33,7 @@ export default function Index() {
   const navigate = useNavigate();
 
   const handleClickAlbum = (idAlbum: number) => {
-    navigate(`/albumDetails?album=${idAlbum}`)
+    navigate(`/albumDetails/${idAlbum}`);
   };
 
   const handleClickArtist = (idArtist: number) => {
