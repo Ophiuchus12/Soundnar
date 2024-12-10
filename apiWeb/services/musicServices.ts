@@ -1,5 +1,5 @@
 import axios from "axios";
-import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList } from '../interfaces/interface'
+import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, SearchResult } from '../interfaces/interface'
 
 
 
@@ -95,6 +95,17 @@ export async function fetchArtistAlbum(artistId: number) {
         const url = `https://api.deezer.com/artist/${artistId}/albums`;
         const reponse = await axios.get<ArtistDetailAlbumList>(url);
         return reponse.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function fetchSearchData(searchData: string) {
+    try {
+        const url = `https://api.deezer.com/search?q=${searchData}`;
+        const response = await axios.get<SearchResult>(url);
+        return response.data;
     } catch (err) {
         console.error(err);
         return null;

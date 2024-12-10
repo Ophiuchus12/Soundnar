@@ -1,4 +1,4 @@
-import { ChartResponseAlbums, ChartResponseArtists, ChartResponseTracks, ArtistByGenreResponse, AlbumDetail, genreResponse, ArtistDetail, ArtistDetailAlbum } from "~/types";
+import { ChartResponseAlbums, ChartResponseArtists, ChartResponseTracks, ArtistByGenreResponse, AlbumDetail, genreResponse, ArtistDetail, ArtistDetailAlbum, SearchResult } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -165,5 +165,22 @@ export async function getArtistAlbums(artistId: number): Promise<ArtistDetailAlb
 
 
 
+/*search by artist */
 
+export async function searchGlobal(content: string): Promise<SearchResult | null> {
+    const URL = `${url}/api/music/artist/search?search=${content}`;
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la recherche par artist');
+        return await response.json() as SearchResult;
+    } catch (err) {
+        console.error('Erreur lors de la recherche par artist : ', err);
+        return null;
+    }
+}
 
