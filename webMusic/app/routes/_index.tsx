@@ -1,5 +1,5 @@
 import "../styles/index.css";
-import { getChartAlbums, getChartArtists, getChartTracks, searchGlobal } from "../lib/Music";
+import { getChartAlbums, getChartArtists, getChartTracks, searchArtist } from "../lib/Music";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, Track } from "../types";
 import { useEffect, useState } from "react";
@@ -51,7 +51,8 @@ export default function Index() {
     }
 
     const fetchSearchResults = async () => {
-      const results = await searchGlobal(artistSearch);
+      const results = await searchArtist(artistSearch);
+      console.log("results", results?.data);
       setSearchResults(results?.data || []);
     };
 
@@ -59,48 +60,38 @@ export default function Index() {
   }, [artistSearch]);
 
   return (
-    <div className="w-full h-full min-h-screen flex flex-col items-center justify-center bg-black">
+    <div className="mx-auto px-4 fade-in">
       {/* Barre de recherche */}
       <SearchBar value={artistSearch} onChange={setArtistSearch} />
 
       {/* Affichage dynamique en fonction de la recherche */}
-      {searchResults && searchResults.length > 0 ? (
-        <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
-          <h2 className="text-white text-3xl font-semibold text-center mb-6">Search Results</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {searchResults.map((item: any) => (
-              <div
-                key={item.id}
-                className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300"
-                onClick={() =>
-                  item.artist ? handleClickArtist(item.artist.id) : item.album ? handleClickAlbum(item.album.id) : null
-                }
-              >
-                {item.artist ? (
-                  <>
-                    <img
-                      className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-white mb-2"
-                      src={item.artist.picture_medium}
-                      alt={item.artist.name}
-                    />
-                    <p className="font-bold">{item.artist.name}</p>
-                    <p className="text-sm text-gray-400">Artist</p>
-                  </>
-                ) : item.album ? (
-                  <>
-                    <img
-                      className="w-50 h-50 object-cover rounded-lg border-2 border-opacity-40 border-white mb-2"
-                      src={item.album.cover_medium}
-                      alt={item.album.title}
-                    />
-                    <p className="font-bold">{item.album.title}</p>
-                    <p className="text-sm text-gray-400">Album</p>
-                  </>
-                ) : null}
-              </div>
-            ))}
+      {searchResults ? (
+        searchResults.length > 0 ? (
+          <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
+            <h2 className="text-white text-3xl font-semibold text-center mb-6">Search Results</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+              {searchResults.map((artist: any) => (
+                <div
+                  key={artist.id}
+                  className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300 cursor-pointer"
+                  onClick={() => handleClickArtist(artist.id)}
+                >
+                  <img
+                    className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-white mb-2"
+                    src={artist.picture_medium}
+                    alt={artist.name}
+                  />
+                  <p className="font-bold">{artist.name}</p>
+                  <p className="text-sm text-gray-400">Artist</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="text-center text-gray-400 mt-6">
+            No artists available.
+          </div>
+        )
       ) : (
         <>
           {/* Liste des albums */}
@@ -110,7 +101,7 @@ export default function Index() {
               {albums.map((album) => (
                 <div
                   key={album.id}
-                  className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300"
+                  className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300 cursor-pointer"
                   onClick={() => handleClickAlbum(album.id)}
                 >
                   <img
@@ -132,7 +123,7 @@ export default function Index() {
               {artists.map((artist) => (
                 <div
                   key={artist.id}
-                  className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300"
+                  className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300 cursor-pointer"
                   onClick={() => handleClickArtist(artist.id)}
                 >
                   <img
