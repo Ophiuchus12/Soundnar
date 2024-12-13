@@ -34,7 +34,7 @@ export default function ArtistDetails() {
     const navigate = useNavigate();
 
     const handleClickAlbum = (idAlbum: number) => {
-        navigate(-1);
+        navigate(`/albumDetails/${idAlbum}`)
     };
 
     return (

@@ -1,5 +1,6 @@
 import { NavLink } from "@remix-run/react";
 import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
+import { FaEye } from "react-icons/fa6";
 import { GiCompactDisc } from "react-icons/gi";
 
 export default function Sidebar() {
@@ -41,6 +42,20 @@ export default function Sidebar() {
                             >
                                 <PiMicrophoneStageFill className="text-xl" />
                                 Artists
+                            </NavLink>
+                        </div>
+                    </li>
+                    <li>
+                        <div className="space-between ">
+                            <NavLink
+                                to="/search"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
+                                    }`
+                                }
+                            >
+                                <FaEye className="text-xl" />
+                                Search
                             </NavLink>
                         </div>
                     </li>
