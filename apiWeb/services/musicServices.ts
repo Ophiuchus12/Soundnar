@@ -1,5 +1,5 @@
 import axios from "axios";
-import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, SearchResult } from '../interfaces/interface'
+import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData } from '../interfaces/interface'
 
 
 
@@ -101,13 +101,28 @@ export async function fetchArtistAlbum(artistId: number) {
     }
 }
 
-export async function fetchSearchData(searchData: string) {
+export async function fetchSearchData(searchData: string): Promise<DeezerSearchResponse | null> {
     try {
         const url = `https://api.deezer.com/search?q=${searchData}`;
-        const response = await axios.get<SearchResult>(url);
+        console.log(url);
+        console.log("Avant la requête à Deezer");
+        const response = await axios.get<DeezerSearchResponse>(url);
+        console.log("Après la requête à Deezer", response.data);
+
         return response.data;
     } catch (err) {
-        console.error(err);
+        console.error('Erreur dans fetchSearchData :', err);
+        return null;
+    }
+}
+
+export async function fetchSearchArtist(searchData: string): Promise<ArtistSearchData | null> {
+    try {
+        const url = `https://api.deezer.com/search/artist?q=${searchData}`;
+        const response = await axios.get<ArtistSearchData>(url);
+        return response.data;
+    } catch (err) {
+        console.error('Erreur dans fetchSearchArtist :', err);
         return null;
     }
 }

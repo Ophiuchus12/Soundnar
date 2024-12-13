@@ -239,12 +239,7 @@ export interface ArtistDetailAlbum {
     type: string;
 
 }
-
-export interface SearchResult {
-    data: SearchResponseTrack[];
-}
-
-export interface SearchResponseTrack {
+export interface DeezerTrack {
     id: number;
     readable: boolean;
     title: string;
@@ -254,14 +249,36 @@ export interface SearchResponseTrack {
     duration: number;
     rank: number;
     explicit_lyrics: boolean;
-    explicit_content_lyrics: number;
-    explicit_content_cover: number;
     preview: string;
-    md5_image: string;
-    artist: ArtistSearch;
-    album: AlbumSearch;
+    artist: {
+        id: number;
+        name: string;
+        link: string;
+        picture: string;
+        picture_small: string;
+        picture_medium: string;
+        picture_big: string;
+        picture_xl: string;
+    };
+    album: {
+        id: number;
+        title: string;
+        cover: string;
+        cover_small: string;
+        cover_medium: string;
+        cover_big: string;
+        cover_xl: string;
+    };
     type: string;
 }
+
+export interface DeezerSearchResponse {
+    data: DeezerTrack[];
+    total: number;
+    next?: string;
+}
+
+
 
 export interface ArtistSearch {
     id: number;
@@ -272,19 +289,13 @@ export interface ArtistSearch {
     picture_medium: string;
     picture_big: string;
     picture_xl: string;
+    nb_album: number;
+    nb_fan: number;
+    radio: boolean;
     tracklist: string;
     type: string;
 }
 
-export interface AlbumSearch {
-    id: number;
-    title: string;
-    cover: string;
-    cover_small: string;
-    cover_medium: string;
-    cover_big: string;
-    cover_xl: string;
-    md5_image: string;
-    tracklist: string;
-    type: string;
+export interface ArtistSearchData {
+    data: ArtistSearch[];
 }
