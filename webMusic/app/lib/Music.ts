@@ -1,4 +1,4 @@
-import { ChartResponseAlbums, ChartResponseArtists, ChartResponseTracks, ArtistByGenreResponse, AlbumDetail, genreResponse, ArtistDetail, ArtistDetailAlbum, SearchResult } from "~/types";
+import { ChartResponseAlbums, ChartResponseArtists, ChartResponseTracks, ArtistByGenreResponse, AlbumDetail, genreResponse, ArtistDetail, ArtistDetailAlbum, DeezerSearchResponse, ArtistSearchData } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -167,8 +167,12 @@ export async function getArtistAlbums(artistId: number): Promise<ArtistDetailAlb
 
 /*search by artist */
 
-export async function searchGlobal(content: string): Promise<SearchResult | null> {
-    const URL = `${url}/api/music/artist/search?search=${content}`;
+export async function searchGlobal(content: string): Promise<DeezerSearchResponse | null> {
+    //console.log("content non code", content);
+    const encodedContent = encodeURIComponent(content);  // Assurez-vous que le terme de recherche est correctement encodé
+    //console.log("content passé", encodedContent);
+    const URL = `${url}/api/music/search?search=${encodedContent}`;
+    //console.log("Search1", URL)
     try {
         const response = await fetch(URL, {
             method: 'GET',
@@ -177,10 +181,36 @@ export async function searchGlobal(content: string): Promise<SearchResult | null
             }
         });
         if (!response.ok) throw new Error('Erreur lors de la recherche par artist');
-        return await response.json() as SearchResult;
+        console.log("Search2", response)
+        const jsonResponse = await response.json() as DeezerSearchResponse;
+        console.log("return", jsonResponse);
+        return jsonResponse;
+
+
     } catch (err) {
         console.error('Erreur lors de la recherche par artist : ', err);
         return null;
     }
 }
 
+
+export async function searchArtist(content: string): Promise<ArtistSearchData | null> {
+    const encodedContent = encodeURIComponent(content);  // Assurez-vous que le terme de recherche est correctement encodé
+    const URL = `${url}/api/music/search/artist?search=${encodedContent}`;
+    console.log("url: " + URL);
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la recherche par artist');
+        const jsonResponse = await response.json() as ArtistSearchData;
+        console.log("JSONresponse", jsonResponse);
+        return jsonResponse;
+    } catch (err) {
+        console.error('Erreur lors de la recherche par artist : ', err);
+        return null;
+    }
+}

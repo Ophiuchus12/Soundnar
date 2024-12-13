@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getGenre, getArtistsByGenre } from '../lib/Music';
+import { getGenre, getArtistsByGenre, searchArtist } from '../lib/Music';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { Genre, Artist } from '../types';
 import "../styles/index.css";
 import SearchBar from '~/components/SearchBar';
-
-
 
 export async function loader() {
     const allGenres = await getGenre();
@@ -18,6 +16,8 @@ export default function Artists() {
     const [artists, setArtists] = useState<Artist[]>([]);
     const [loading, setLoading] = useState<boolean>(false); // Gestion du chargement
     const [artistSearch, setArtistSearch] = useState("");
+    const [searchResults, setSearchResults] = useState<any | null>(null);
+
     const navigate = useNavigate();
 
     const searchArtistByGenre = async (idGenre: number) => {
@@ -42,34 +42,85 @@ export default function Artists() {
         searchArtistByGenre(idGenres);
     }, [idGenres]); // Effectuer la recherche dès que le genre est modifié
 
-    const handleArtist = (idArtist: number) => {
+    useEffect(() => {
+        if (artistSearch.trim() === "") {
+            setSearchResults(null);
+            return;
+        }
+
+        const fetchSearchResults = async () => {
+            const results = await searchArtist(artistSearch);
+            setSearchResults(results?.data || []);
+        };
+
+        fetchSearchResults();
+    }, [artistSearch]);
+
+    const handleClickArtist = (idArtist: number) => {
         navigate(`/artistDetails/${idArtist}`);
-    }
+    };
 
     return (
         <div className="mx-auto px-4 fade-in">
             <SearchBar value={artistSearch} onChange={setArtistSearch} />
             {/* Dropdown des genres et bouton de soumission */}
-            <div className="flex justify-center items-center mt-6">
-                <label className="relative mr-4">
-                    <select
-                        value={idGenres} // Afficher la valeur actuelle du genre sélectionné
-                        onChange={(e) => setIdGenres(parseInt(e.target.value, 10))}
-                        className="bg-gray-800 text-white py-2 px-4 rounded-lg border border-gray-600 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-300 ease-in-out hover:bg-gray-700"
-                    >
-
-                        {genres.map((genre) => (
-                            <option key={genre.id} value={genre.id}>
-                                {genre.name}
-                            </option>
+            {searchResults && searchResults.length > 0 ? (
+                <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
+                    <h2 className="text-white text-3xl font-semibold text-center mb-6">Search Results</h2>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                        {searchResults.map((item: any) => (
+                            <div
+                                key={item.id}
+                                className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300"
+                                onClick={() =>
+                                    item.artist ? handleClickArtist(item.artist.id) : null
+                                }
+                            >
+                                {item.artist ? (
+                                    <>
+                                        <img
+                                            className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-white mb-2"
+                                            src={item.artist.picture_medium}
+                                            alt={item.artist.name}
+                                        />
+                                        <p className="font-bold">{item.artist.name}</p>
+                                        <p className="text-sm text-gray-400">Artist</p>
+                                    </>
+                                ) : item.album ? (
+                                    <>
+                                        <img
+                                            className="w-50 h-50 object-cover rounded-lg border-2 border-opacity-40 border-white mb-2"
+                                            src={item.album.cover_medium}
+                                            alt={item.album.title}
+                                        />
+                                        <p className="font-bold">{item.album.title}</p>
+                                        <p className="text-sm text-gray-400">Album</p>
+                                    </>
+                                ) : null}
+                            </div>
                         ))}
-                    </select>
-                </label>
-
-            </div>
+                    </div>
+                </div>
+            ) : (
+                <div className="flex justify-center items-center mt-6">
+                    <label className="relative mr-4">
+                        <select
+                            value={idGenres} // Afficher la valeur actuelle du genre sélectionné
+                            onChange={(e) => setIdGenres(parseInt(e.target.value, 10))}
+                            className="bg-gray-800 text-white py-2 px-4 rounded-lg border border-gray-600 shadow-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition duration-300 ease-in-out hover:bg-gray-700"
+                        >
+                            {genres.map((genre) => (
+                                <option key={genre.id} value={genre.id}>
+                                    {genre.name}
+                                </option>
+                            ))}
+                        </select>
+                    </label>
+                </div>
+            )}
 
             {/* Liste des artistes */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mt-8">
                 {artists.length === 0 && !loading ? (
                     <div className="text-center text-gray-400">
                         Aucun artiste disponible pour le moment.
@@ -78,8 +129,8 @@ export default function Artists() {
                     artists.map((artist) => (
                         <div
                             key={artist.id}
-                            className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105 "
-                            onClick={() => handleArtist(artist.id)}
+                            className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105"
+                            onClick={() => handleClickArtist(artist.id)}
                         >
                             <img
                                 src={artist.picture_medium}
@@ -87,8 +138,6 @@ export default function Artists() {
                                 className="rounded-full mb-4 w-full object-cover border-2 border-opacity-40 border-white"
                             />
                             <h2 className="text-white text-lg font-bold text-center">{artist.name}</h2>
-
-
                         </div>
                     ))
                 )}
