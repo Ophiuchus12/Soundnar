@@ -165,7 +165,7 @@ export async function getArtistAlbums(artistId: number): Promise<ArtistDetailAlb
 
 
 
-/*search by artist */
+/*search by global */
 
 export async function searchGlobal(content: string): Promise<DeezerSearchResponse | null> {
     //console.log("content non code", content);
