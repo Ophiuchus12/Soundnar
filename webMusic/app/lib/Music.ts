@@ -1,4 +1,22 @@
-import { ChartResponseAlbums, ChartResponseArtists, ChartResponseTracks, ArtistByGenreResponse, AlbumDetail, genreResponse, ArtistDetail, ArtistDetailAlbum, DeezerSearchResponse, ArtistSearchData } from "~/types";
+import {
+    ChartResponseAlbums,
+    ChartResponseArtists,
+    ChartResponseTracks,
+    ArtistByGenreResponse,
+    AlbumDetail,
+    genreResponse,
+    ArtistDetail,
+    ArtistDetailAlbum,
+    DeezerSearchResponse,
+    ArtistSearchData,
+    SearchType,
+    SearchResult,
+    ArtistSearch,
+    DeezerGlobal,
+    AlbumSearch,
+    TrackSearch,
+    PlaylistSearch
+} from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -166,32 +184,57 @@ export async function getArtistAlbums(artistId: number): Promise<ArtistDetailAlb
 
 
 /*search by global */
+export async function searchGlobal<T extends SearchType>(
+    type: T,
+    content: string
+): Promise<
+    | (T extends "all"
+        ? SearchResult<DeezerGlobal>
+        : T extends "artist"
+        ? SearchResult<ArtistSearch>
+        : T extends "album"
+        ? SearchResult<AlbumSearch>
+        : T extends "track"
+        ? SearchResult<TrackSearch>
+        : T extends "playlist"
+        ? SearchResult<PlaylistSearch>
+        : never)
+    | null
+> {
+    const encodedContent = encodeURIComponent(content);
+    const URL = `${url}/api/music/search/${type}?search=${encodedContent}`;
 
-export async function searchGlobal(content: string): Promise<DeezerSearchResponse | null> {
-    //console.log("content non code", content);
-    const encodedContent = encodeURIComponent(content);  // Assurez-vous que le terme de recherche est correctement encodé
-    //console.log("content passé", encodedContent);
-    const URL = `${url}/api/music/search?search=${encodedContent}`;
-    //console.log("Search1", URL)
     try {
         const response = await fetch(URL, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         });
-        if (!response.ok) throw new Error('Erreur lors de la recherche par artist');
-        console.log("Search2", response)
-        const jsonResponse = await response.json() as DeezerSearchResponse;
-        console.log("return", jsonResponse);
+
+        if (!response.ok) {
+            throw new Error(`Erreur lors de la recherche (${response.status}): ${response.statusText}`);
+        }
+
+        // Cast explicite pour aider TypeScript
+        const jsonResponse = await response.json() as
+            T extends "all" ? SearchResult<DeezerGlobal> :
+            T extends "artist" ? SearchResult<ArtistSearch> :
+            T extends "album" ? SearchResult<AlbumSearch> :
+            T extends "track" ? SearchResult<TrackSearch> :
+            T extends "playlist" ? SearchResult<PlaylistSearch> :
+            never;
+
         return jsonResponse;
 
-
     } catch (err) {
-        console.error('Erreur lors de la recherche par artist : ', err);
+        console.error('Erreur lors de la recherche : ', err);
         return null;
     }
 }
+
+
+
 
 
 export async function searchArtist(content: string): Promise<ArtistSearchData | null> {

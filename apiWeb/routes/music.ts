@@ -14,6 +14,6 @@ router.get("/album/:idAlbum", getSingleAlbum);
 router.get("/artist/:idArtist", getSingleArtist);
 router.get("/artist/:idArtist/albums", getSingleArtistAlbums);
 router.get("/search/artist", getSearchArtist);
-router.get("/search", getSearchGlobal);
+router.get("/search/:type", getSearchGlobal);
 
 export default router;
