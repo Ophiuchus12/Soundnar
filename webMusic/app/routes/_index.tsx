@@ -1,5 +1,5 @@
 import "../styles/index.css";
-import { getChartAlbums, getChartArtists, getChartTracks, searchArtist } from "../lib/Music";
+import { getChartAlbums, getChartArtists, getChartTracks, searchArtist, searchGlobal } from "../lib/Music";
 import { useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, Track } from "../types";
 import { useEffect, useState } from "react";
@@ -51,8 +51,8 @@ export default function Index() {
     }
 
     const fetchSearchResults = async () => {
-      const results = await searchArtist(artistSearch);
-      console.log("results", results?.data);
+      const results = await searchGlobal("artist", artistSearch);
+      //console.log("results", results?.data);
       setSearchResults(results?.data || []);
     };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getGenre, getArtistsByGenre, searchArtist } from '../lib/Music';
+import { getGenre, getArtistsByGenre, searchArtist, searchGlobal } from '../lib/Music';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import { Genre, Artist } from '../types';
 import "../styles/index.css";
@@ -49,7 +49,7 @@ export default function Artists() {
         }
 
         const fetchSearchResults = async () => {
-            const results = await searchArtist(artistSearch);
+            const results = await searchGlobal("artist", artistSearch);
             setSearchResults(results?.data || []);
         };
 
