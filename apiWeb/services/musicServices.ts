@@ -1,5 +1,5 @@
 import axios from "axios";
-import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData } from '../interfaces/interface'
+import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData, SearchResult, DeezerGlobal, ArtistSearch, AlbumSearch, TrackSearch, PlaylistSearch, SearchType } from '../interfaces/interface'
 
 
 
@@ -101,20 +101,58 @@ export async function fetchArtistAlbum(artistId: number) {
     }
 }
 
-export async function fetchSearchData(searchData: string): Promise<DeezerSearchResponse | null> {
-    try {
-        const url = `https://api.deezer.com/search?q=${searchData}`;
-        console.log(url);
-        console.log("Avant la requête à Deezer");
-        const response = await axios.get<DeezerSearchResponse>(url);
-        console.log("Après la requête à Deezer", response.data);
+export async function fetchSearchData<T extends SearchType>(
+    type: T,
+    searchData: string
+): Promise<
+    | (T extends "all"
+        ? SearchResult<DeezerGlobal>
+        : T extends "artist"
+        ? SearchResult<ArtistSearch>
+        : T extends "album"
+        ? SearchResult<AlbumSearch>
+        : T extends "track"
+        ? SearchResult<TrackSearch>
+        : T extends "playlist"
+        ? SearchResult<PlaylistSearch>
+        : never)
+    | null
+> {
 
-        return response.data;
+    const baseUrl = "https://api.deezer.com/search";
+    const encodedSearchData = encodeURIComponent(searchData);
+    const url = type === "all"
+        ? `${baseUrl}?q=${encodedSearchData}`
+        : `${baseUrl}/${type}?q=${encodedSearchData}`;
+
+    try {
+        console.log("URL appelée :", url);
+
+        // Effectuer la requête à l'API Deezer
+        const response = await axios.get(url);
+
+        // Cast explicite basé sur le type conditionnel
+        const data = response.data as T extends "all"
+            ? SearchResult<DeezerGlobal>
+            : T extends "artist"
+            ? SearchResult<ArtistSearch>
+            : T extends "album"
+            ? SearchResult<AlbumSearch>
+            : T extends "track"
+            ? SearchResult<TrackSearch>
+            : T extends "playlist"
+            ? SearchResult<PlaylistSearch>
+            : never;
+
+        console.log("Données récupérées :", data);
+
+        return data;
     } catch (err) {
-        console.error('Erreur dans fetchSearchData :', err);
+        console.error("Erreur dans fetchSearchData :", err);
         return null;
     }
 }
+
 
 export async function fetchSearchArtist(searchData: string): Promise<ArtistSearchData | null> {
     try {
