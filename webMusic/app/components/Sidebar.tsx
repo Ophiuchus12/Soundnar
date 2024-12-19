@@ -7,7 +7,7 @@ export default function Sidebar() {
 
 
     return (
-        <div className="w-64 h-full bg-gray-800 p-2 fixed left-0 top-0 z-100">
+        <div className="w-64 h-full bg-gray-800 p-2 fixed left-0 top-0 z-100 rounded-t-3xl rounded-b-3xl ml-4 ">
             <div className="flex justify-center mb-2">
                 <img
                     className="w-45 h-25 rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]"

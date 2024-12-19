@@ -45,18 +45,21 @@ export default function Index() {
   };
 
   useEffect(() => {
-    if (artistSearch.trim() === "") {
-      setSearchResults(null);
-      return;
-    }
+    const debounceTimer = setTimeout(() => {
+      if (artistSearch.trim() === "") {
+        setSearchResults(null);
+        return;
+      }
 
-    const fetchSearchResults = async () => {
-      const results = await searchGlobal("artist", artistSearch);
-      //console.log("results", results?.data);
-      setSearchResults(results?.data || []);
-    };
+      const fetchSearchResults = async () => {
+        const results = await searchGlobal("artist", artistSearch);
+        setSearchResults(results?.data || []);
+      };
 
-    fetchSearchResults();
+      fetchSearchResults();
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
   }, [artistSearch]);
 
   return (
