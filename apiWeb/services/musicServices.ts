@@ -1,67 +1,6 @@
 import axios from "axios";
+import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData, SearchResult, DeezerGlobal, ArtistSearch, AlbumSearch, TrackSearch, PlaylistSearch, SearchType } from '../interfaces/interface'
 
-export type chartAlbumResponse = {
-    data: Album[];
-}
-
-export type chartArtistResponse = {
-    data: Artist[];
-}
-
-export type chartTracksresponse = {
-    data: Track[];
-}
-
-export interface Album {
-    id: number;
-    title: string;
-    link: string;
-    cover: string;
-    cover_small: string;
-    cover_medium: string;
-    cover_big: string;
-    cover_xl: string;
-    md5_image: string;
-    record_type: string;
-    tracklist: string;
-    explicit_lyrics: boolean;
-    position: number;
-    artist: string[];
-    type: string;
-}
-
-export interface Artist {
-    id: number;
-    name: string;
-    link: string;
-    picture: string;
-    picture_small: string;
-    picture_medium: string;
-    picture_big: string;
-    picture_xl: string;
-    radio: boolean;
-    tracklist: string;
-    type: string;
-}
-
-export interface Track {
-    id: number;
-    title: string;
-    title_short: string;
-    title_version: string;
-    link: string;
-    duration: number;
-    rank: number;
-    explicit_lyrics: boolean;
-    explicit_content_lyrics: number;
-    explicit_content_cover: number;
-    preview: string;
-    md5_image: string;
-    position: number;
-    artist: Artist; // Référence à l'interface `Artist`
-    album: Album;   // Référence à l'interface `Album`
-    type: string;   // e.g., "track"
-}
 
 
 
@@ -100,16 +39,7 @@ export async function fetchChartTracks() {
     }
 }
 
-export interface genreResponse {
-    id: number,
-    name: string,
-    picture: string,
-    picture_small: string,
-    picture_medium: string,
-    picture_big: string,
-    picture_xl: string,
-    type: string
-}
+
 
 export async function fetchGenres() {
     try {
@@ -123,9 +53,7 @@ export async function fetchGenres() {
 }
 
 
-export interface artistsByGenreResponse {
-    data: string[];
-}
+
 
 export async function fetchArtistsByGenre(genreId: number) {
     try {
@@ -137,3 +65,104 @@ export async function fetchArtistsByGenre(genreId: number) {
         return null;
     }
 }
+
+
+
+export async function fetchAlbum(albumId: number) {
+    try {
+        const url = `https://api.deezer.com/album/${albumId}`;
+        const response = await axios.get<AlbumDetail>(url);
+        return response.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function fetchArtist(artistId: number) {
+    try {
+        const url = `https://api.deezer.com/artist/${artistId}`;
+        const reponse = await axios.get<ArtistDetail>(url);
+        return reponse.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function fetchArtistAlbum(artistId: number) {
+    try {
+        const url = `https://api.deezer.com/artist/${artistId}/albums`;
+        const reponse = await axios.get<ArtistDetailAlbumList>(url);
+        return reponse.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function fetchSearchData<T extends SearchType>(
+    type: T,
+    searchData: string
+): Promise<
+    | (T extends "all"
+        ? SearchResult<DeezerGlobal>
+        : T extends "artist"
+        ? SearchResult<ArtistSearch>
+        : T extends "album"
+        ? SearchResult<AlbumSearch>
+        : T extends "track"
+        ? SearchResult<TrackSearch>
+        : T extends "playlist"
+        ? SearchResult<PlaylistSearch>
+        : never)
+    | null
+> {
+
+    const baseUrl = "https://api.deezer.com/search";
+    const encodedSearchData = encodeURIComponent(searchData);
+    const url = type === "all"
+        ? `${baseUrl}?q=${encodedSearchData}`
+        : `${baseUrl}/${type}?q=${encodedSearchData}`;
+
+    try {
+        console.log("URL appelée :", url);
+
+        // Effectuer la requête à l'API Deezer
+        const response = await axios.get(url);
+
+        // Cast explicite basé sur le type conditionnel
+        const data = response.data as T extends "all"
+            ? SearchResult<DeezerGlobal>
+            : T extends "artist"
+            ? SearchResult<ArtistSearch>
+            : T extends "album"
+            ? SearchResult<AlbumSearch>
+            : T extends "track"
+            ? SearchResult<TrackSearch>
+            : T extends "playlist"
+            ? SearchResult<PlaylistSearch>
+            : never;
+
+        console.log("Données récupérées :", data);
+
+        return data;
+    } catch (err) {
+        console.error("Erreur dans fetchSearchData :", err);
+        return null;
+    }
+}
+
+
+export async function fetchSearchArtist(searchData: string): Promise<ArtistSearchData | null> {
+    try {
+        const url = `https://api.deezer.com/search/artist?q=${searchData}`;
+        const response = await axios.get<ArtistSearchData>(url);
+        return response.data;
+    } catch (err) {
+        console.error('Erreur dans fetchSearchArtist :', err);
+        return null;
+    }
+}
+
+

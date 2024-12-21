@@ -42,7 +42,7 @@ export default function App() {
   const home = useLottie(options);
 
   return (
-    <html lang="en" className="h-full">
+    <html lang="en" className="h-full bg-black">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -58,7 +58,7 @@ export default function App() {
         {isAnimationComplete && (
           <div className="flex h-full min-h-screen fade-in">
             <Sidebar />
-            <main className="flex-1 ml-64">
+            <main className="flex-1 ml-64 p-6">
               <Outlet />
             </main>
           </div>

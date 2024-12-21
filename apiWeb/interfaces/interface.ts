@@ -1,20 +1,14 @@
-export type ChartAllAlbums = {
+
+export type chartAlbumResponse = {
     data: Album[];
 }
 
-export interface ChartResponseAlbums {
-    data: Album[]; // Un tableau d'objets de type Album
-}
-export interface ChartResponseArtists {
-    data: Artist[]; // Un tableau d'objets de type Artist
+export type chartArtistResponse = {
+    data: Artist[];
 }
 
-export interface ChartResponseTracks {
-    data: Track[]; // Un tableau d'objets de type Track
-}
-
-export interface ArtistByGenreResponse {
-    data: Artist[]; // Tableau des artistes
+export type chartTracksresponse = {
+    data: Track[];
 }
 
 export interface Album {
@@ -31,25 +25,22 @@ export interface Album {
     tracklist: string;
     explicit_lyrics: boolean;
     position: number;
-    artist: Artist;
+    artist: string[];
     type: string;
 }
 
 export interface Artist {
-    id: number;
-    name: string;
-    link: string;
-    picture: string;
-    picture_small: string;
-    picture_medium: string;
-    picture_big: string;
-    picture_xl: string;
-    radio: boolean;
-    tracklist: string;
-    position: number;
-    type: string;
+    id: number; // ID de l'artiste
+    name: string; // Nom de l'artiste
+    picture: string; // URL de l'image principale
+    picture_small: string; // URL de l'image petite
+    picture_medium: string; // URL de l'image moyenne
+    picture_big: string; // URL de l'image grande
+    picture_xl: string; // URL de l'image extra-large
+    radio: boolean; // Indique si la radio est disponible pour cet artiste
+    tracklist: string; // URL de la liste des pistes principales
+    type: string; // Type d'entité (ex. "artist")
 }
-
 
 export interface Track {
     id: number;
@@ -70,25 +61,6 @@ export interface Track {
     type: string;   // e.g., "track"
 }
 
-export interface Playlist {
-    id: number;                   // Identifiant unique de la playlist
-    title: string;                // Titre de la playlist
-    public: boolean;              // Indique si la playlist est publique
-    nb_tracks: number;            // Nombre total de morceaux dans la playlist
-    link: string;                 // Lien vers la page Deezer de la playlist
-    picture: string;              // URL de l'image principale de la playlist
-    picture_small: string;        // URL de l'image en petite taille (56x56)
-    picture_medium: string;       // URL de l'image en taille moyenne (250x250)
-    picture_big: string;          // URL de l'image en grande taille (500x500)
-    picture_xl: string;           // URL de l'image en très grande taille (1000x1000)
-    checksum: string;             // Somme de contrôle de la playlist
-    tracklist: string;            // URL de la liste des morceaux de la playlist
-    creation_date: string;        // Date de création de la playlist (format: "YYYY-MM-DD HH:mm:ss")
-    md5_image: string;            // MD5 de l'image associée à la playlist
-    picture_type: string;         // Type de l'image associée (e.g., "playlist")
-    user: User;                   // Référence à l'utilisateur ayant créé la playlist
-    type: string;                 // Type de ressource (e.g., "playlist")
-}
 
 export interface genreResponse {
     data: Genre[],
@@ -106,7 +78,9 @@ export interface Genre {
     type: string
 }
 
-
+export interface artistsByGenreResponse {
+    data: Artist[];
+}
 
 
 export interface AlbumDetail {
@@ -173,30 +147,6 @@ export interface Contributor {
 }
 
 
-export interface User {
-    id: number;                   // Identifiant unique de l'utilisateur
-    name: string;                 // Nom de l'utilisateur
-    tracklist: string;            // URL de la liste des morceaux (flow) de l'utilisateur
-    type: string;                 // Type de ressource (e.g., "user")
-}
-
-
-export interface Podcast {
-    id: number;                   // Identifiant unique du podcast
-    title: string;                // Titre du podcast
-    description: string;          // Description du podcast
-    available: boolean;           // Indique si le podcast est disponible
-    fans: number;                 // Nombre de fans (auditeurs abonnés)
-    link: string;                 // Lien vers la page Deezer du podcast
-    share: string;                // Lien de partage du podcast
-    picture: string;              // URL de l'image principale du podcast
-    picture_small: string;        // URL de l'image en petite taille (56x56)
-    picture_medium: string;       // URL de l'image en taille moyenne (250x250)
-    picture_big: string;          // URL de l'image en grande taille (500x500)
-    picture_xl: string;           // URL de l'image en très grande taille (1000x1000)
-    type: string;                 // Type de ressource (e.g., "podcast")
-}
-
 export interface ArtistDetail {
     id: number;
     name: string;
@@ -241,20 +191,72 @@ export interface ArtistDetailAlbum {
 }
 
 
+
+export interface DeezerTrack {
+    id: number;
+    readable: boolean;
+    title: string;
+    title_short: string;
+    title_version: string;
+    link: string;
+    duration: number;
+    rank: number;
+    explicit_lyrics: boolean;
+    preview: string;
+    artist: {
+        id: number;
+        name: string;
+        link: string;
+        picture: string;
+        picture_small: string;
+        picture_medium: string;
+        picture_big: string;
+        picture_xl: string;
+    };
+    album: {
+        id: number;
+        title: string;
+        cover: string;
+        cover_small: string;
+        cover_medium: string;
+        cover_big: string;
+        cover_xl: string;
+    };
+    type: string;
+}
+
 export interface DeezerSearchResponse {
-    data: DeezerGlobal[];
+    data: DeezerTrack[];
     total: number;
     next?: string;
 }
 
+
+
+export interface ArtistSearch {
+    id: number;
+    name: string;
+    link: string;
+    picture: string;
+    picture_small: string;
+    picture_medium: string;
+    picture_big: string;
+    picture_xl: string;
+    nb_album: number;
+    nb_fan: number;
+    radio: boolean;
+    tracklist: string;
+    type: string;
+}
 
 export interface ArtistSearchData {
     data: ArtistSearch[];
 }
 
 
+//////////////////////////////////////////////
 
-//////////////////////////////////////////////////
+
 
 export type SearchType = "all" | "artist" | "album" | "track" | "playlist";
 
@@ -385,4 +387,11 @@ export interface PlaylistSearch {
     picture_type: string; // Typiquement "playlist"
     user: User; // Détails du créateur de la playlist
     type: string; // Typiquement "playlist"
+}
+
+export interface User {
+    id: number;                   // Identifiant unique de l'utilisateur
+    name: string;                 // Nom de l'utilisateur
+    tracklist: string;            // URL de la liste des morceaux (flow) de l'utilisateur
+    type: string;                 // Type de ressource (e.g., "user")
 }
