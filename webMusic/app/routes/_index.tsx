@@ -65,7 +65,7 @@ export default function Index() {
   return (
     <div className="mx-auto px-4 fade-in">
       {/* Barre de recherche */}
-      <SearchBar value={artistSearch} onChange={setArtistSearch} />
+      <SearchBar value={artistSearch} onChange={setArtistSearch} placeholder="find your artist" />
 
       {/* Affichage dynamique en fonction de la recherche */}
       {searchResults ? (
@@ -163,8 +163,12 @@ export default function Index() {
                     <h3 className="font-bold text-white text-lg truncate">{track.title}</h3>
                     <button
                       onClick={() => handlePlayClick(track.id)}
-                      className="text-white text-3xl p-2 rounded-full bg-[#6a00ab] hover:bg-[#3b1d79] transition-all"
-                      aria-label="Lire le morceau"
+                      className={`rounded-full p-2 transition-all ${playingTrackId === track.id
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-gray-800 text-2xl text-gray-400 hover:bg-purple-900/50 hover:text-white'
+                        }`}
+                      aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
+
                     >
                       <GiMusicSpell />
                     </button>
