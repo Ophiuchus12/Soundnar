@@ -240,7 +240,7 @@ export async function searchGlobal<T extends SearchType>(
 export async function searchArtist(content: string): Promise<ArtistSearchData | null> {
     const encodedContent = encodeURIComponent(content);  // Assurez-vous que le terme de recherche est correctement encodé
     const URL = `${url}/api/music/search/artist?search=${encodedContent}`;
-    console.log("url: " + URL);
+    //console.log("url: " + URL);
     try {
         const response = await fetch(URL, {
             method: 'GET',
@@ -250,7 +250,7 @@ export async function searchArtist(content: string): Promise<ArtistSearchData | 
         });
         if (!response.ok) throw new Error('Erreur lors de la recherche par artist');
         const jsonResponse = await response.json() as ArtistSearchData;
-        console.log("JSONresponse", jsonResponse);
+        //console.log("JSONresponse", jsonResponse);
         return jsonResponse;
     } catch (err) {
         console.error('Erreur lors de la recherche par artist : ', err);
