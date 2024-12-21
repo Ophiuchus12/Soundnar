@@ -1,13 +1,22 @@
 import { NavLink } from "@remix-run/react";
 import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
+import { RiArrowDownSFill } from "react-icons/ri";
 import { FaEye } from "react-icons/fa6";
+import { FaSearch } from "react-icons/fa";
 import { GiCompactDisc } from "react-icons/gi";
+import { useState } from "react";
 
 export default function Sidebar() {
 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen((prev) => !prev);
+    };
+
 
     return (
-        <div className="w-64 h-full bg-gray-800 p-2 fixed left-0 top-0 z-100">
+        <div className="w-64 h-full bg-transparent p-2 fixed left-0 top-0 z-100 rounded-tr-3xl mr-4 border-purple-500/50">
             <div className="flex justify-center mb-2">
                 <img
                     className="w-45 h-25 rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]"
@@ -18,7 +27,7 @@ export default function Sidebar() {
             <nav>
                 <ul className="text-white space-y-4">
                     <li>
-                        <div className="space-between ">
+                        <div className="space-between">
                             <NavLink
                                 to="/"
                                 className={({ isActive }) =>
@@ -32,7 +41,7 @@ export default function Sidebar() {
                         </div>
                     </li>
                     <li>
-                        <div className="space-between ">
+                        <div className="space-between">
                             <NavLink
                                 to="/artists"
                                 className={({ isActive }) =>
@@ -46,21 +55,64 @@ export default function Sidebar() {
                         </div>
                     </li>
                     <li>
-                        <div className="space-between ">
-                            <NavLink
-                                to="/search"
-                                className={({ isActive }) =>
-                                    `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
-                                    }`
-                                }
+                        <div className={`relative ${isDropdownOpen ? "mb-40" : "mb-0"}`}>
+                            {/* Bouton pour ouvrir/fermer le menu */}
+                            <button
+                                onClick={toggleDropdown}
+                                className="flex items-center justify-between w-full p-3 rounded transition-colors hover:bg-gray-700"
                             >
-                                <FaEye className="text-xl" />
-                                Search
-                            </NavLink>
+                                <div className="flex items-center gap-x-3">
+                                    <FaEye className="text-xl" />
+                                    Search
+                                </div>
+                                <RiArrowDownSFill className="text-xl" />
+                            </button>
+
+                            {/* Menu déroulant */}
+                            {isDropdownOpen && (
+                                <div className="absolute left-0 w-full mt-2 bg-gray-800 rounded-lg shadow-lg z-10">
+                                    {/* Global Search */}
+                                    <NavLink
+                                        to="/searchGlobal"
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
+                                            }`
+                                        }
+                                    >
+                                        <FaSearch className="text-xl" />
+                                        Global Search
+                                    </NavLink>
+
+                                    {/* Artist Search */}
+                                    <NavLink
+                                        to="/searchArtist"
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
+                                            }`
+                                        }
+                                    >
+                                        <FaEye className="text-xl" />
+                                        Find your Artist
+                                    </NavLink>
+
+                                    {/* Album Search */}
+                                    <NavLink
+                                        to="/searchAlbum"
+                                        className={({ isActive }) =>
+                                            `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
+                                            }`
+                                        }
+                                    >
+                                        <FaEye className="text-xl" />
+                                        Find your Album
+                                    </NavLink>
+                                </div>
+                            )}
                         </div>
                     </li>
+
                     <li>
-                        <div className="space-between ">
+                        <div className="space-between">
                             <NavLink
                                 to="/playlists"
                                 className={({ isActive }) =>
@@ -74,6 +126,7 @@ export default function Sidebar() {
                         </div>
                     </li>
                 </ul>
+
             </nav>
         </div>
     );

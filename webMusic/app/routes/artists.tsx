@@ -63,7 +63,7 @@ export default function Artists() {
     return (
         <div className="mx-auto px-4 fade-in">
             {/* Barre de recherche */}
-            <SearchBar value={artistSearch} onChange={setArtistSearch} />
+            <SearchBar value={artistSearch} onChange={setArtistSearch} placeholder='find your artist' />
 
             {/* Affichage des résultats de recherche si une recherche est effectuée */}
             {searchResults ? (
@@ -124,7 +124,7 @@ export default function Artists() {
                             artists.map((artist) => (
                                 <div
                                     key={artist.id}
-                                    className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105"
+                                    className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105 cursor-pointer"
                                     onClick={() => handleClickArtist(artist.id)}
                                 >
                                     <img
