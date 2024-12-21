@@ -7,11 +7,13 @@ export default function Search() {
 
     const [searchValue, setSearchValue] = useState("");
     const [searchResults, setSearchResults] = useState<any | null>(null);
+    const [searchArtistGlobal, setsearchArtistGlobal] = useState([]);
     // pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [hasMore, setHasMore] = useState(false);
 
     const RESULTS_PER_PAGE = 8;
+
 
 
     useEffect(() => {
@@ -27,7 +29,7 @@ export default function Search() {
                 const totalResults = results?.data || [];
                 setSearchResults(totalResults.slice(0, RESULTS_PER_PAGE));
                 setHasMore(totalResults.length > RESULTS_PER_PAGE);
-                console.log(results);
+                //console.log(results);
             };
 
             fetchSearchResults();
@@ -103,40 +105,53 @@ export default function Search() {
                     <div className="mt-8">
                         <h2 className="text-white text-2xl mb-4">Artists</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                            {searchResults
-                                .map((all: any) => (
-
-                                    <div key={all.artist.id} className="text-center">
-                                        <img
-                                            src={all.artist.picture_medium}
-                                            alt={all.artist.name}
-                                            className="w-32 h-32 object-cover rounded-full mx-auto mb-2"
-                                        />
-                                        <h3 className="text-white text-lg">{all.artist.name}</h3>
-                                    </div>
-                                ))}
+                            {[
+                                ...new Map(
+                                    searchResults.map((item: any) => [item.artist.id, item.artist])
+                                ).values(),
+                            ].map((artist: any) => (
+                                <div key={artist.id} className="text-center">
+                                    <img
+                                        src={artist.picture_medium}
+                                        alt={artist.name}
+                                        className="w-32 h-32 object-cover rounded-full mx-auto mb-2"
+                                    />
+                                    <h3 className="text-white text-lg">{artist.name}</h3>
+                                </div>
+                            ))}
                         </div>
                     </div>
+
 
                     {/* Albums */}
-                    <div className="mt-8">
+                    <div className="mt-8 mb-6">
                         <h2 className="text-white text-2xl mb-4">Albums</h2>
                         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                            {searchResults
-                                .filter((item: any) => item.type === "album")
-                                .map((album: any) => (
-                                    <div key={album.id} className="text-center">
-                                        <img
-                                            src={album.cover_medium}
-                                            alt={album.title}
-                                            className="w-32 h-32 object-cover rounded-lg mx-auto mb-2"
-                                        />
-                                        <h3 className="text-white text-lg">{album.title}</h3>
-                                        <p className="text-gray-400 text-sm">by {album.artist.name}</p>
-                                    </div>
-                                ))}
+                            {[
+                                ...new Map<string, { album: any; artist: any }>(
+                                    searchResults.map((item: any) => [
+                                        item.album.id, // Clé unique pour chaque album
+                                        {
+                                            album: item.album,
+                                            artist: item.artist, // Inclure les infos de l'artiste
+                                        },
+                                    ])
+                                ).values(),
+                            ].map(({ album, artist }) => (
+                                <div key={album.id} className="text-center">
+                                    <img
+                                        src={album.cover_medium}
+                                        alt={album.title}
+                                        className="w-32 h-32 object-cover rounded-lg mx-auto mb-2"
+                                    />
+                                    <h3 className="text-white text-lg">{album.title}</h3>
+                                    <p className="text-gray-400 text-sm">by {artist.name}</p>
+                                </div>
+                            ))}
                         </div>
                     </div>
+
+
 
 
                 </div>
