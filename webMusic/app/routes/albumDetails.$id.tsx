@@ -150,7 +150,7 @@ export default function AlbumDetails() {
             </div>
 
             {/* Liste des morceaux */}
-            <div className="flex flex-col mx-8 md:mx-20 bg-gray-800 p-6 rounded-xl shadow-xl">
+            <div className="flex flex-col mx-8 md:mx-20 bg-gray-800 p-6 rounded-xl shadow-xl overflow-y-auto" style={{ maxHeight: '400px' }}>
                 {albumData?.tracks.data.map((track) => (
                     <div key={track.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-4 hover:bg-gray-600">
                         <div className="flex flex-col">

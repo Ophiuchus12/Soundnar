@@ -4,6 +4,7 @@ import { RiArrowDownSFill } from "react-icons/ri";
 import { FaEye } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { GiCompactDisc } from "react-icons/gi";
+import { IoAlbumsOutline, IoPersonOutline } from "react-icons/io5";
 import { useState } from "react";
 
 export default function Sidebar() {
@@ -70,7 +71,7 @@ export default function Sidebar() {
 
                             {/* Menu déroulant */}
                             {isDropdownOpen && (
-                                <div className="absolute left-0 w-full mt-2 bg-gray-800 rounded-lg shadow-lg z-10">
+                                <div className="absolute left-0 w-full mt-2 bg-gray-800 rounded-b-lg shadow-lg z-10">
                                     {/* Global Search */}
                                     <NavLink
                                         to="/searchGlobal"
@@ -91,7 +92,7 @@ export default function Sidebar() {
                                             }`
                                         }
                                     >
-                                        <FaEye className="text-xl" />
+                                        <IoPersonOutline className="text-xl" />
                                         Find your Artist
                                     </NavLink>
 
@@ -103,7 +104,7 @@ export default function Sidebar() {
                                             }`
                                         }
                                     >
-                                        <FaEye className="text-xl" />
+                                        <IoAlbumsOutline className="text-xl" />
                                         Find your Album
                                     </NavLink>
                                 </div>
