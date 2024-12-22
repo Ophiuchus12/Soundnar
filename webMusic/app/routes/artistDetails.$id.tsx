@@ -101,7 +101,7 @@ export default function ArtistDetails() {
             <div className="flex w-full px-6 pb-20 space-x-6 mt-10">
                 {/* Albums Section */}
                 <div className="w-1/2">
-                    <h2 className="mb-8 text-2xl font-bold text-white">Top 5 musics</h2>
+                    <h2 className="mb-8 text-2xl font-bold text-white">Top musics</h2>
                     <div
                         className="overflow-y-auto"
                         style={{ maxHeight: '400px' }}
