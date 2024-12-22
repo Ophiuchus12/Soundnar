@@ -1,10 +1,11 @@
 import "../styles/index.css";
-import { getChartAlbums, getChartArtists, getChartTracks, searchArtist, searchGlobal } from "../lib/Music";
+import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist, searchGlobal } from "../lib/Music";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { Album, Artist, Track } from "../types";
+import { Album, Artist, Genre, Track } from "../types";
 import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
+import GenreCarousel from "~/components/GenreCarousel";
 
 export async function loader() {
   const chartAlbum = await getChartAlbums();
@@ -16,10 +17,14 @@ export async function loader() {
   const chartTrack = await getChartTracks();
   if (!chartTrack) throw new Error("Failed to fetch chart tracks");
 
+  const genreList = await getGenre();
+  if (!genreList) throw new Error("Failed to fetch genre list");
+
   return {
     albums: chartAlbum.data,
     artists: chartArtist.data,
     tracks: chartTrack.data,
+    genres: genreList.data,
   };
 }
 
@@ -27,6 +32,7 @@ export default function Index() {
   const { albums } = useLoaderData<{ albums: Album[] }>();
   const { artists } = useLoaderData<{ artists: Artist[] }>();
   const { tracks } = useLoaderData<{ tracks: Track[] }>();
+  const { genres } = useLoaderData<{ genres: Genre[] }>();
   const [artistSearch, setArtistSearch] = useState("");
   const [searchResults, setSearchResults] = useState<any | null>(null);
   const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
@@ -97,6 +103,8 @@ export default function Index() {
         )
       ) : (
         <>
+          {/* Liste des genres */}
+          <GenreCarousel genres={genres} />
           {/* Liste des albums */}
           <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
             <h2 className="text-white text-3xl font-semibold text-center mb-6">Top Albums</h2>
