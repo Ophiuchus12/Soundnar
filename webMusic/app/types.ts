@@ -213,6 +213,26 @@ export interface ArtistDetail {
     tracklist: string;
 }
 
+export interface ArtistTopSongList {
+    data: ArtistTopSong[];
+}
+
+export interface ArtistTopSong {
+    id: number;
+    readable: boolean;
+    title: string;
+    title_short: string;
+    title_version: string;
+    link: string;
+    duration: number;
+    rank: number;
+    explicit_lyrics: boolean;
+    preview: string;
+    contributors: Contributor[];
+    artist: Artist;
+    album: Album;
+}
+
 export interface ArtistDetailAlbumList {
     data: ArtistDetailAlbum[];
 }

@@ -7,7 +7,6 @@ import {
     genreResponse,
     ArtistDetail,
     ArtistDetailAlbum,
-    DeezerSearchResponse,
     ArtistSearchData,
     SearchType,
     SearchResult,
@@ -15,7 +14,8 @@ import {
     DeezerGlobal,
     AlbumSearch,
     TrackSearch,
-    PlaylistSearch
+    PlaylistSearch,
+    ArtistTopSongList
 } from "~/types";
 
 const url = "http://localhost:3000"
@@ -154,6 +154,25 @@ export async function getArtist(artistId: number): Promise<ArtistDetail | null> 
         return await response.json() as ArtistDetail;
     } catch (err) {
         console.error('Erreur lors de la récupération des données artist : ', err);
+        return null;
+    }
+}
+
+/*recuperation top 5 artist songs */
+
+export async function getArtistTopSong(artistId: number): Promise<ArtistTopSongList | null> {
+    const URL = `${url}/api/music/artist/${artistId}/topSongs`;
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la récupération des données artist top 5 songs');
+        return await response.json() as ArtistTopSongList;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des données artist top 5 songs : ', err);
         return null;
     }
 }

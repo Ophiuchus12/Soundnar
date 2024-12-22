@@ -150,39 +150,42 @@ export default function AlbumDetails() {
             </div>
 
             {/* Liste des morceaux */}
-            <div className="flex flex-col mx-8 md:mx-20 bg-gray-800 p-6 rounded-xl shadow-xl overflow-y-auto" style={{ maxHeight: '400px' }}>
-                {albumData?.tracks.data.map((track) => (
-                    <div key={track.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-4 hover:bg-gray-600">
-                        <div className="flex flex-col">
-                            <h1 className="text-white text-lg">{track?.title}</h1>
-                            <h2 className="text-gray-400 text-sm">{formatDuration(track.duration)}</h2>
-                        </div>
+            <div className="flex flex-col mx-8 md:mx-20 bg-gray-800 p-6 rounded-xl shadow-xl ">
+                <p className='text-3xl text-white mb-3'>Tracks : {albumData?.nb_tracks}</p>
+                <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
+                    {albumData?.tracks.data.map((track) => (
+                        <div key={track.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-4 hover:bg-gray-600">
+                            <div className="flex flex-col">
+                                <h1 className="text-white text-lg">{track?.title}</h1>
+                                <h2 className="text-gray-400 text-sm">{formatDuration(track.duration)}</h2>
+                            </div>
 
-                        <button
-                            onClick={() => handlePlayClick(track.id)}
-                            className={`rounded-full p-2 transition-all ${playingTrackId === track.id
-                                ? 'bg-purple-600 text-white'
-                                : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
-                                }`}
-                            aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
-                        >
-                            <GiMusicSpell className="h-5 w-5" />
-                        </button>
-
-                        {/* Rendre conditionnellement le lecteur audio pour le morceau sélectionné */}
-                        {playingTrackId === track.id && (
-                            <audio
-                                className="hidden"
-                                controls
-                                autoPlay
+                            <button
+                                onClick={() => handlePlayClick(track.id)}
+                                className={`rounded-full p-2 transition-all ${playingTrackId === track.id
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
+                                    }`}
+                                aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
                             >
-                                <source src={track.preview} type="audio/mpeg" />
-                                Votre navigateur ne supporte pas l'élément audio.
-                            </audio>
-                        )}
-                    </div>
-                ))
-                }
+                                <GiMusicSpell className="h-5 w-5" />
+                            </button>
+
+                            {/* Rendre conditionnellement le lecteur audio pour le morceau sélectionné */}
+                            {playingTrackId === track.id && (
+                                <audio
+                                    className="hidden"
+                                    controls
+                                    autoPlay
+                                >
+                                    <source src={track.preview} type="audio/mpeg" />
+                                    Votre navigateur ne supporte pas l'élément audio.
+                                </audio>
+                            )}
+                        </div>
+                    ))
+                    }
+                </div>
             </div>
 
 

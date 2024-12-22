@@ -1,5 +1,5 @@
 import axios from "axios";
-import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData, SearchResult, DeezerGlobal, ArtistSearch, AlbumSearch, TrackSearch, PlaylistSearch, SearchType } from '../interfaces/interface'
+import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData, SearchResult, DeezerGlobal, ArtistSearch, AlbumSearch, TrackSearch, PlaylistSearch, SearchType, ArtistTopSongList } from '../interfaces/interface'
 
 
 
@@ -84,6 +84,17 @@ export async function fetchArtist(artistId: number) {
         const url = `https://api.deezer.com/artist/${artistId}`;
         const reponse = await axios.get<ArtistDetail>(url);
         return reponse.data;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
+}
+
+export async function fetchTopSongArtist(artistId: number) {
+    try {
+        const url = `https://api.deezer.com/artist/${artistId}/top`;
+        const response = await axios.get<ArtistTopSongList>(url);
+        return response.data;
     } catch (err) {
         console.error(err);
         return null;
