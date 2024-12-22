@@ -43,18 +43,22 @@ export default function Artists() {
     }, [idGenres]); // Effectuer la recherche dès que le genre est modifié
 
     useEffect(() => {
-        if (artistSearch.trim() === "") {
-            setSearchResults(null);
-            return;
-        }
+        const debounceTimer = setTimeout(() => {
+            if (artistSearch.trim() === "") {
+                setSearchResults(null);
+                return;
+            }
 
-        const fetchSearchResults = async () => {
-            const results = await searchGlobal("artist", artistSearch);
-            setSearchResults(results?.data || []);
-        };
+            const fetchSearchResults = async () => {
+                const results = await searchGlobal("artist", artistSearch);
+                setSearchResults(results?.data || []);
+            };
 
-        fetchSearchResults();
+            fetchSearchResults();
+        }, 300);
+        return () => clearTimeout(debounceTimer);
     }, [artistSearch]);
+
 
     const handleClickArtist = (idArtist: number) => {
         navigate(`/artistDetails/${idArtist}`);
@@ -124,13 +128,13 @@ export default function Artists() {
                             artists.map((artist) => (
                                 <div
                                     key={artist.id}
-                                    className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105 cursor-pointer"
+                                    className="p-4 rounded-lg shadow-md hover:shadow-2xl transition duration-300 ease-in-out hover:scale-105  cursor-pointer"
                                     onClick={() => handleClickArtist(artist.id)}
                                 >
                                     <img
                                         src={artist.picture_medium}
                                         alt={artist.name}
-                                        className="rounded-full mb-4 w-full object-cover border-2 border-opacity-40 border-white"
+                                        className="rounded-full mb-4 w-full object-cover border-2 border-purple-500/50 border-blur-lg"
                                     />
                                     <h2 className="text-white text-lg font-bold text-center">{artist.name}</h2>
                                 </div>
