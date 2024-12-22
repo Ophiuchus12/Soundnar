@@ -26,4 +26,7 @@ https://api.deezer.com/search/playlist?q=eminem
 
 https://api.deezer.com/playlist/908622995
 
-
+TO DO:
+- artist page -> top 5 songs
+- dev better home page 
+- options login a developper (front) -> stop if not login
