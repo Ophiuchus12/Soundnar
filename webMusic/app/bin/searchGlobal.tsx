@@ -101,17 +101,7 @@ export default function Search() {
                                     </div>
                                 ))}
                             </div>
-                            {/* Bouton "Load More" désactivé */}
-                            {/*
-                            {hasMore && (
-                                <button
-                                    onClick={loadMoreResults}
-                                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition w-full"
-                                >
-                                    Load More
-                                </button>
-                            )}
-                            */}
+
                         </div>
 
                         {/* Artists - boîte à droite */}
