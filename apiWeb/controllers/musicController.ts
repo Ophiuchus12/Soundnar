@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks, fetchAlbum, fetchArtist, fetchArtistAlbum, fetchSearchData, fetchSearchArtist } from "../services/musicServices";
+import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks, fetchAlbum, fetchArtist, fetchArtistAlbum, fetchSearchData, fetchSearchArtist, fetchTopSongArtist } from "../services/musicServices";
 import { SearchType } from "../interfaces/interface";
 
 export async function getChartAlbums(_: Request, res: Response): Promise<void> {
@@ -98,7 +98,7 @@ export async function getSingleArtist(req: Request, res: Response): Promise<void
     try {
         const artistId = parseInt(req.params.idArtist);
         const artistData = await fetchArtist(artistId);
-        console.log("moving to3", artistData);
+        //console.log("moving to3", artistData);
         if (!artistData) {
             res.status(404).json({ message: "Artist not found" });
             return;
@@ -107,6 +107,21 @@ export async function getSingleArtist(req: Request, res: Response): Promise<void
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Erreur lors de la récuération des données de l'artiste" });
+    }
+}
+
+export async function getTopSongsArtist(req: Request, res: Response): Promise<void> {
+    try {
+        const artistId = parseInt(req.params.idArtist);
+        const songArtistDAta = await fetchTopSongArtist(artistId);
+        if (!songArtistDAta) {
+            res.status(404).json({ message: "Artist's top songs not found" });
+            return;
+        }
+        res.status(200).json(songArtistDAta);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récuération des top musiques de l'artiste" });
     }
 }
 

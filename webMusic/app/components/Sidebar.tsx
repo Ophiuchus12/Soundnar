@@ -4,6 +4,7 @@ import { RiArrowDownSFill } from "react-icons/ri";
 import { FaEye } from "react-icons/fa6";
 import { FaSearch } from "react-icons/fa";
 import { GiCompactDisc } from "react-icons/gi";
+import { IoAlbumsOutline, IoPersonOutline } from "react-icons/io5";
 import { useState } from "react";
 
 export default function Sidebar() {
@@ -55,59 +56,17 @@ export default function Sidebar() {
                         </div>
                     </li>
                     <li>
-                        <div className={`relative ${isDropdownOpen ? "mb-40" : "mb-0"}`}>
-                            {/* Bouton pour ouvrir/fermer le menu */}
-                            <button
-                                onClick={toggleDropdown}
-                                className="flex items-center justify-between w-full p-3 rounded transition-colors hover:bg-gray-700"
+                        <div className="space-between">
+                            <NavLink
+                                to="/albums"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
+                                    }`
+                                }
                             >
-                                <div className="flex items-center gap-x-3">
-                                    <FaEye className="text-xl" />
-                                    Search
-                                </div>
-                                <RiArrowDownSFill className="text-xl" />
-                            </button>
-
-                            {/* Menu déroulant */}
-                            {isDropdownOpen && (
-                                <div className="absolute left-0 w-full mt-2 bg-gray-800 rounded-lg shadow-lg z-10">
-                                    {/* Global Search */}
-                                    <NavLink
-                                        to="/searchGlobal"
-                                        className={({ isActive }) =>
-                                            `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
-                                            }`
-                                        }
-                                    >
-                                        <FaSearch className="text-xl" />
-                                        Global Search
-                                    </NavLink>
-
-                                    {/* Artist Search */}
-                                    <NavLink
-                                        to="/searchArtist"
-                                        className={({ isActive }) =>
-                                            `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
-                                            }`
-                                        }
-                                    >
-                                        <FaEye className="text-xl" />
-                                        Find your Artist
-                                    </NavLink>
-
-                                    {/* Album Search */}
-                                    <NavLink
-                                        to="/searchAlbum"
-                                        className={({ isActive }) =>
-                                            `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
-                                            }`
-                                        }
-                                    >
-                                        <FaEye className="text-xl" />
-                                        Find your Album
-                                    </NavLink>
-                                </div>
-                            )}
+                                <IoAlbumsOutline className="text-xl" />
+                                Albums
+                            </NavLink>
                         </div>
                     </li>
 

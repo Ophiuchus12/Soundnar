@@ -1,10 +1,11 @@
 import "../styles/index.css";
-import { getChartAlbums, getChartArtists, getChartTracks, searchArtist, searchGlobal } from "../lib/Music";
+import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist, searchGlobal } from "../lib/Music";
 import { useLoaderData, useNavigate } from "@remix-run/react";
-import { Album, Artist, Track } from "../types";
+import { Album, Artist, Genre, Track } from "../types";
 import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
+import GenreCarousel from "~/components/GenreCarousel";
 
 export async function loader() {
   const chartAlbum = await getChartAlbums();
@@ -16,29 +17,28 @@ export async function loader() {
   const chartTrack = await getChartTracks();
   if (!chartTrack) throw new Error("Failed to fetch chart tracks");
 
+  const genreList = await getGenre();
+  if (!genreList) throw new Error("Failed to fetch genre list");
+
   return {
     albums: chartAlbum.data,
     artists: chartArtist.data,
     tracks: chartTrack.data,
+    genres: genreList.data,
   };
 }
 
 export default function Index() {
-  const { albums } = useLoaderData<{ albums: Album[] }>();
-  const { artists } = useLoaderData<{ artists: Artist[] }>();
-  const { tracks } = useLoaderData<{ tracks: Track[] }>();
-  const [artistSearch, setArtistSearch] = useState("");
-  const [searchResults, setSearchResults] = useState<any | null>(null);
+  const { albums, artists, tracks, genres } = useLoaderData<{
+    albums: Album[];
+    artists: Artist[];
+    tracks: Track[];
+    genres: Genre[];
+  }>();
+  const [searchValue, setSearchValue] = useState('');
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
   const navigate = useNavigate();
-
-  const handleClickAlbum = (idAlbum: number) => {
-    navigate(`/albumDetails/${idAlbum}`);
-  };
-
-  const handleClickArtist = (idArtist: number) => {
-    navigate(`/artistDetails/${idArtist}`);
-  };
 
   const handlePlayClick = (trackId: number) => {
     setPlayingTrackId(playingTrackId === trackId ? null : trackId);
@@ -46,13 +46,13 @@ export default function Index() {
 
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
-      if (artistSearch.trim() === "") {
-        setSearchResults(null);
+      if (searchValue.trim() === "") {
+        setSearchResults([]);
         return;
       }
 
       const fetchSearchResults = async () => {
-        const results = await searchGlobal("artist", artistSearch);
+        const results = await searchGlobal("all", searchValue);
         setSearchResults(results?.data || []);
       };
 
@@ -60,43 +60,122 @@ export default function Index() {
     }, 300);
 
     return () => clearTimeout(debounceTimer);
-  }, [artistSearch]);
+  }, [searchValue]);
+  const handleClickArtist = (idArtist: number) => {
+    navigate(`/artistDetails/${idArtist}`);
+  };
+
+  const handleClickAlbum = (idAlbum: number) => {
+    navigate(`/albumDetails/${idAlbum}`);
+  };
 
   return (
     <div className="mx-auto px-4 fade-in">
       {/* Barre de recherche */}
-      <SearchBar value={artistSearch} onChange={setArtistSearch} placeholder="find your artist" />
+      <SearchBar value={searchValue} onChange={setSearchValue} placeholder="find your inspiration" />
 
-      {/* Affichage dynamique en fonction de la recherche */}
-      {searchResults ? (
-        searchResults.length > 0 ? (
-          <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
-            <h2 className="text-white text-3xl font-semibold text-center mb-6">Search Results</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-              {searchResults.map((artist: any) => (
+      {/* Affichage des résultats */}
+      {searchResults.length > 0 ? (
+        <div className="mt-6">
+          <div className="flex gap-6">
+            {/* Tracks - boîte à gauche */}
+            <div
+              className="flex-1 bg-gray-800 p-4 rounded-lg overflow-y-auto"
+              style={{ maxHeight: "400px" }}
+            >
+              <h2 className="text-white text-2xl mb-4">Tracks</h2>
+              <div className="flex flex-col gap-4">
+                {searchResults.map((track: any) => (
+                  <div
+                    key={track.id}
+                    className="flex items-center bg-gray-900 p-4 rounded-lg hover:bg-gray-700 transition cursor-pointer"
+                  >
+                    {/* Thumbnail */}
+                    <img
+                      src={`https://e-cdns-images.dzcdn.net/images/cover/${track.md5_image}/250x250-000000-80-0-0.jpg`}
+                      alt={track.title}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    {/* Details */}
+                    <div className="ml-4 flex-1">
+                      <h3 className="text-white text-base font-medium">{track.title}</h3>
+                      <p className="text-gray-400 text-sm">by {track.artist.name}</p>
+                    </div>
+                    {/* Audio Preview */}
+                    <audio controls src={track.preview} className="ml-4 w-24">
+                      Your browser does not support the audio element.
+                    </audio>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Artists - boîte à droite */}
+            <div
+              className="flex-1 bg-gray-800 p-4 rounded-lg overflow-y-auto"
+              style={{ maxHeight: "400px" }}
+            >
+              <h2 className="text-white text-2xl mb-4">Artists</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {[
+                  ...new Map(
+                    searchResults.map((item: any) => [item.artist.id, item.artist])
+                  ).values(),
+                ].map((artist: any) => (
+                  <div
+                    key={artist.id}
+                    className="text-center cursor-pointer"
+                    onClick={() => handleClickArtist(artist.id)}
+                  >
+                    <img
+                      src={artist.picture_medium}
+                      alt={artist.name}
+                      className="w-32 h-32 object-cover rounded-full mx-auto mb-2"
+                    />
+                    <h3 className="text-white text-lg">{artist.name}</h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Albums en dessous */}
+          <div className="mt-8">
+            <h2 className="text-white text-2xl mb-4">Albums</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              {[
+                ...new Map<string, { album: any; artist: any }>(
+                  searchResults.map((item: any) => [
+                    item.album.id,
+                    {
+                      album: item.album,
+                      artist: item.artist,
+                    },
+                  ])
+                ).values(),
+              ].map(({ album, artist }) => (
                 <div
-                  key={artist.id}
-                  className="text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300 cursor-pointer"
-                  onClick={() => handleClickArtist(artist.id)}
+                  key={album.id}
+                  className="text-center cursor-pointer"
+                  onClick={() => handleClickAlbum(album.id)}
                 >
                   <img
-                    className="w-50 h-50 object-cover rounded-full border-2 border-opacity-40 border-white mb-2"
-                    src={artist.picture_medium}
-                    alt={artist.name}
+                    src={album.cover_medium}
+                    alt={album.title}
+                    className="w-32 h-32 object-cover rounded-lg mx-auto mb-2"
                   />
-                  <p className="font-bold">{artist.name}</p>
-                  <p className="text-sm text-gray-400">Artist</p>
+                  <h3 className="text-white text-lg">{album.title}</h3>
+                  <p className="text-gray-400 text-sm">by {artist.name}</p>
                 </div>
               ))}
             </div>
           </div>
-        ) : (
-          <div className="text-center text-gray-400 mt-6">
-            No artists available.
-          </div>
-        )
+        </div>
       ) : (
         <>
+          {/* Liste des genres */}
+          <GenreCarousel genres={genres} />
+
           {/* Liste des albums */}
           <div className="w-full bg-opacity-30 p-6 rounded-lg mb-10">
             <h2 className="text-white text-3xl font-semibold text-center mb-6">Top Albums</h2>
@@ -164,11 +243,10 @@ export default function Index() {
                     <button
                       onClick={() => handlePlayClick(track.id)}
                       className={`rounded-full p-2 transition-all ${playingTrackId === track.id
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-gray-800 text-2xl text-gray-400 hover:bg-purple-900/50 hover:text-white'
+                        ? "bg-purple-600 text-white"
+                        : "bg-gray-800 text-2xl text-gray-400 hover:bg-purple-900/50 hover:text-white"
                         }`}
-                      aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
-
+                      aria-label={playingTrackId === track.id ? "Stop" : "Play"}
                     >
                       <GiMusicSpell />
                     </button>
