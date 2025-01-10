@@ -1,6 +1,7 @@
 import React from 'react';
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { Genre } from '../types';
+import { useNavigate } from '@remix-run/react';
 
 interface GenreCarouselProps {
     genres: Genre[];
@@ -8,6 +9,8 @@ interface GenreCarouselProps {
 
 const GenreCarousel: React.FC<GenreCarouselProps> = ({ genres }) => {
     const scrollRef = React.useRef<HTMLDivElement | null>(null);
+
+    const navigate = useNavigate();
 
     const scroll = (direction: 'left' | 'right'): void => {
         if (scrollRef.current) {
@@ -17,6 +20,10 @@ const GenreCarousel: React.FC<GenreCarouselProps> = ({ genres }) => {
                 behavior: 'smooth'
             });
         }
+    };
+
+    const handleGenre = (idGenre: number): void => {
+        navigate(`/genreArtist/${idGenre}`);
     };
 
     return (
@@ -41,6 +48,7 @@ const GenreCarousel: React.FC<GenreCarouselProps> = ({ genres }) => {
                             <div
                                 key={genre.id}
                                 className="w-[200px] flex-none text-white text-center flex flex-col items-center hover:scale-105 transition-all duration-300 cursor-pointer"
+                                onClick={() => handleGenre(genre.id)}
                             >
                                 <div className="w-40 h-40">
                                     <img
