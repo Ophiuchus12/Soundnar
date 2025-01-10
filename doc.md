@@ -281,3 +281,72 @@ Voici le tableau comparatif entre `navigate` et `redirect` :
 | **Maintien de l'état**          | L'état de l'application est maintenu pendant la navigation | L'état de l'application peut être perdu lors du rechargement de la page |
 | **Historique du navigateur**    | Peut être ajouté à l'historique (si `replace: false`) ou remplacé (`replace: true`) | L'URL est changée dans l'historique avec la redirection |
 | **Exemple d'utilisation**      | `navigate("/profile")`                           | `return redirect("/login")`                         |
+
+
+
+
+# Prima 
+## Commandes :
+
+Pour ajouter une base de données à votre projet et utiliser Prisma comme ORM, voici les étapes détaillées :
+1. Installer Prisma et ses dépendances
+
+Commencez par installer Prisma et ses dépendances dans votre projet :
+
+npm install prisma @prisma/client
+
+
+
+2. Initialiser Prisma
+
+Initialisez Prisma dans votre projet :
+
+npx prisma init
+
+Cela crée deux fichiers importants :
+
+    prisma/schema.prisma : le fichier de configuration Prisma.
+    .env : le fichier pour stocker les variables d’environnement, notamment la chaîne de connexion à la base de données.
+
+Pour ajouter une base de données à votre projet et utiliser Prisma comme ORM, voici les étapes détaillées :
+1. Installer Prisma et ses dépendances
+
+Commencez par installer Prisma et ses dépendances dans votre projet :
+
+npm install prisma @prisma/client
+
+2. Initialiser Prisma
+
+Initialisez Prisma dans votre projet :
+
+npx prisma init
+
+Cela crée deux fichiers importants :
+
+    prisma/schema.prisma : le fichier de configuration Prisma.
+    .env : le fichier pour stocker les variables d’environnement, notamment la chaîne de connexion à la base de données.
+
+3. Configurer la base de données
+
+Dans .env, configurez la chaîne de connexion à votre base de données. Voici un exemple pour différentes bases :
+
+    SQLite (par défaut pour des projets simples) :
+
+DATABASE_URL="file:./dev.db"
+
+
+4. Définir le schéma Prisma
+
+Ouvrez prisma/schema.prisma et définissez les modèles pour votre base de données
+
+5. Appliquer le schéma à la base de données
+
+Générez les migrations pour synchroniser votre schéma avec la base de données :
+
+npx prisma migrate dev --name init
+
+6. Générer le client Prisma
+
+Générez le client Prisma pour utiliser votre base de données dans votre projet :
+
+npx prisma generate
