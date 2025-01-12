@@ -12,7 +12,7 @@ model User {
   pseudo    String     @unique
   mdp       String
   createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  updatedAt DateTime?  @updatedAt
   playlists Playlist[]
 }
 

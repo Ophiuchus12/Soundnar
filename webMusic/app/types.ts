@@ -406,3 +406,23 @@ export interface PlaylistSearch {
     user: User; // Détails du créateur de la playlist
     type: string; // Typiquement "playlist"
 }
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////
+//user part 
+
+export interface User {
+    idUser: string;
+    username: string;
+    password: string;
+}
+
+export interface UserResponse {
+    message: string;
+    user?: User;
+    token?: string;
+}
