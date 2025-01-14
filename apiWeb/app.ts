@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import musicRoutes from "./routes/music";
+import userRoutes from "./routes/user";
 
 const app = express();
 const PORT = 3000;
@@ -14,6 +15,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/music", musicRoutes);
+app.use("/api/user", userRoutes);
 
 
 

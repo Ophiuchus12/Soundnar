@@ -29,3 +29,6 @@ https://api.deezer.com/playlist/908622995
 TO DO:
 - dev better home page 
 - options login a developper (front) -> stop if not login 
+- dev log page 
+- improve album detail page
+- block playlist option for non connected user
