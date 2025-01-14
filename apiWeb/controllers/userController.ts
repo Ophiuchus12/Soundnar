@@ -81,3 +81,21 @@ export async function register(req: Request, res: Response): Promise<void> {
         res.status(500).json({ message: "Erreur lors de l'inscription." });
     }
 }
+
+
+export async function getMe(req: Request, res: Response): Promise<void> {
+    try {
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if (!token) {
+            res.status(403).json({ message: "Token manquant." });
+            return;
+        }
+
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        res.status(200).json({ message: "Authenticated", user: decoded });
+    } catch (error) {
+        res.status(403).json({ message: "Token invalide." });
+    }
+}

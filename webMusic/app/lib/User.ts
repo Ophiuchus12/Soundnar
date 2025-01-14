@@ -50,3 +50,46 @@ export async function register(username: string, password: string): Promise<User
         return null;
     }
 }
+
+
+export async function getMe(token: string): Promise<UserResponse | null> {
+    const URL = `${url}/api/user/me`;
+
+    try {
+        const response = await fetch(URL, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok)
+            throw new Error("Erreur lors de la récupération des données");
+
+        return (await response.json()) as UserResponse;
+    } catch (error) {
+        console.error("Erreur dans getMe:", error);
+        return null;
+    }
+}
+
+export async function verify(token: string): Promise<UserResponse | null> {
+    const URL = `${url}/api/user/verify`;
+
+    try {
+        const response = await fetch(URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        if (!response.ok) throw new Error("Erreur lors de la vérification");
+
+        return (await response.json()) as UserResponse;
+    } catch (error) {
+        return null;
+    }
+}
