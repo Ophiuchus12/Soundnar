@@ -93,3 +93,27 @@ export async function verify(token: string): Promise<UserResponse | null> {
         return null;
     }
 }
+
+export async function updateProfile(token: string, userId: string, username: string, newPassword: string): Promise<UserResponse> {
+    const URL = `${url}/api/user/update/${userId}`;
+
+    const body = { username, newPassword };
+
+    try {
+        const response = await fetch(URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) throw new Error("Erreur lors de la mise à jour du profil");
+
+        return (await response.json()) as UserResponse;
+    } catch (error) {
+        console.error("Erreur dans updateProfile:", error);
+        throw error;
+    }
+}
