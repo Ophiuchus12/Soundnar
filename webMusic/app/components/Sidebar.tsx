@@ -1,8 +1,5 @@
 import { NavLink } from "@remix-run/react";
 import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
-import { RiArrowDownSFill } from "react-icons/ri";
-import { FaEye } from "react-icons/fa6";
-import { FaSearch } from "react-icons/fa";
 import { GiCompactDisc } from "react-icons/gi";
 import { IoAlbumsOutline, IoPersonOutline } from "react-icons/io5";
 import { useState } from "react";
