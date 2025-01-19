@@ -6,8 +6,13 @@ import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
+import { LoaderFunction } from "@remix-run/node";
+import { getSession } from "~/session.server";
 
-export async function loader() {
+export const loader: LoaderFunction = async ({ request }) => {
+  const session = await getSession(request.headers.get("Cookie"));
+  //const token = session.get
+
   const chartAlbum = await getChartAlbums();
   if (!chartAlbum) throw new Error("Failed to fetch chart album");
 
