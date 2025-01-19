@@ -29,22 +29,26 @@ export async function login(req: Request, res: Response): Promise<void> {
             return;
         }
 
+        // Générer un jeton JWT pour l'utilisateur authentifié
         const token = jwt.sign(
-            { id: user.id, username: user.pseudo },
-            JWT_SECRET,
-            { expiresIn: "10h" }
+            { id: user.id, username: user.pseudo }, // Charge utile du jeton (données encodées)
+            JWT_SECRET, // Clé secrète utilisée pour signer le jeton
+            { expiresIn: "10h" } // Durée de validité du jeton
         );
 
+        // Répondre avec un statut 200 (OK) et inclure les informations de l'utilisateur et le jeton dans la réponse
         res.status(200).json({
-            message: "Connexion réussie.",
-            user: { id: user.id, username: user.pseudo },
-            token,
+            message: "Connexion réussie.", // Message de confirmation
+            user: { id: user.id, username: user.pseudo }, // Informations publiques sur l'utilisateur
+            token, // Jeton JWT pour authentification future
         });
     } catch (error) {
         console.error(error);
+
         res.status(500).json({ message: "Erreur lors de la connexion." });
     }
 }
+
 
 
 export async function register(req: Request, res: Response): Promise<void> {
@@ -56,9 +60,10 @@ export async function register(req: Request, res: Response): Promise<void> {
         });
 
         if (existingUser) {
-            res.status(409).json({ message: "Utilisateur déjà existant." });
+            res.status(409).json({ error: "USERNAME_TAKEN", message: "Utilisateur déjà existant." });
             return;
         }
+
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -97,5 +102,65 @@ export async function getMe(req: Request, res: Response): Promise<void> {
         res.status(200).json({ message: "Authenticated", user: decoded });
     } catch (error) {
         res.status(403).json({ message: "Token invalide." });
+    }
+}
+
+
+
+export async function updateUserData(req: Request, res: Response): Promise<void> {
+    try {
+        const { userId } = req.params;
+        const { username, newPassword } = req.body;
+
+        if (!userId) {
+            res.status(400).json({ message: "Id de l'utilisateur manquant." });
+            return;
+        }
+
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+        });
+
+        if (!user) {
+            res.status(404).json({ message: "Utilisateur non trouvé." });
+            return;
+        }
+
+        const updateData: { username?: string, newPassword?: string } = {};
+
+        if (username) {
+            const existingUser = await prisma.user.findUnique({
+                where: { pseudo: username }
+            })
+
+            if (existingUser && existingUser.id !== userId) {
+                res.status(409).json({ message: "Utilisateur déjà existant." });
+                return;
+            }
+
+            updateData.username = username;
+        }
+
+        if (newPassword) {
+            const hashedPassword = await bcrypt.hash(newPassword, 10);
+            updateData.newPassword = hashedPassword;
+        }
+
+        const updatedUser = await prisma.user.update({
+            where: { id: userId },
+            data: updateData,
+        })
+
+        res.status(200).json({
+            message: "Utilisateur mis à jour avec succès.",
+            user: {
+                id: updatedUser.id,
+                username: updatedUser.pseudo,
+                updatedAt: updatedUser.createdAt
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erreur lors de la mise à jour des données utilisateur." });
     }
 }

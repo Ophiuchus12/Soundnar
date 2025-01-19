@@ -6,35 +6,89 @@ import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
+import { LoaderFunction } from "@remix-run/node";
+import { commitSession, getSession } from "~/session.server";
+import { verify } from "~/lib/User";
 
-export async function loader() {
-  const chartAlbum = await getChartAlbums();
-  if (!chartAlbum) throw new Error("Failed to fetch chart album");
+export const loader: LoaderFunction = async ({ request }) => {
+  // Handle session and authentication
+  const session = await getSession(request.headers.get("Cookie"));
+  const token = session.get("authToken");
+  const error = session.get("error") || null;
 
-  const chartArtist = await getChartArtists();
-  if (!chartArtist) throw new Error("Failed to fetch chart artists");
+  if (error) {
+    session.unset("error");
+  }
 
-  const chartTrack = await getChartTracks();
-  if (!chartTrack) throw new Error("Failed to fetch chart tracks");
+  let isAuthenticated = undefined;
+  if (token) {
+    isAuthenticated = await verify(token);
+  }
 
-  const genreList = await getGenre();
-  if (!genreList) throw new Error("Failed to fetch genre list");
+  // Fetch required data
+  try {
+    const [chartAlbum, chartArtist, chartTrack, genreList] = await Promise.all([
+      getChartAlbums(),
+      getChartArtists(),
+      getChartTracks(),
+      getGenre(),
+    ]);
 
-  return {
-    albums: chartAlbum.data,
-    artists: chartArtist.data,
-    tracks: chartTrack.data,
-    genres: genreList.data,
-  };
-}
+    if (!chartAlbum || !chartArtist || !chartTrack || !genreList) {
+      throw new Error("Failed to fetch all necessary data");
+    }
+
+    // Return response as JSON
+    return new Response(
+      JSON.stringify({
+        isAuthenticated,
+        error,
+        albums: chartAlbum.data,
+        artists: chartArtist.data,
+        tracks: chartTrack.data,
+        genres: genreList.data,
+      }),
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": await commitSession(session),
+        },
+      }
+    );
+  } catch (err) {
+    // Handle errors gracefully
+    return new Response(
+      JSON.stringify({
+        isAuthenticated,
+        error: error,
+        albums: [],
+        artists: [],
+        tracks: [],
+        genres: [],
+      }),
+      {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+          "Set-Cookie": await commitSession(session),
+        },
+      }
+    );
+  }
+};
+
 
 export default function Index() {
-  const { albums, artists, tracks, genres } = useLoaderData<{
+  const { albums, artists, tracks, genres, isAuthenticated, error } = useLoaderData<{
     albums: Album[];
     artists: Artist[];
     tracks: Track[];
     genres: Genre[];
+    isAuthenticated: boolean;
+    error: string | null;
   }>();
+
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
@@ -72,7 +126,7 @@ export default function Index() {
   return (
     <>
       {/* Header Section */}
-      <header className="bg-gradient-to-r from-purple-600 to-blue-500 text-white p-4 shadow-md">
+      <header className="bg-gradient-to-r from-purple-600 to-blue-500 text-white p-4 shadow-md ">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <h1
@@ -94,12 +148,21 @@ export default function Index() {
           </div>
 
           {/* Bouton de connexion */}
-          <button
-            onClick={() => navigate("/login")}
-            className="bg-white text-purple-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-purple-600 hover:text-white transition"
-          >
-            Connexion
-          </button>
+          {!isAuthenticated ? (
+            <button
+              onClick={() => navigate("/auth")}
+              className="bg-white text-purple-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-purple-600 hover:text-white transition"
+            >
+              Login
+            </button>
+          ) : (
+            <button
+              //onClick={() => navigate("/auth")}
+              className="bg-white text-purple-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-purple-600 hover:text-white transition"
+            >
+              Logout
+            </button>)}
+
         </div>
       </header>
       <div className="mx-auto px-4 fade-in">

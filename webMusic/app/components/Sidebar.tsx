@@ -1,8 +1,5 @@
 import { NavLink } from "@remix-run/react";
 import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
-import { RiArrowDownSFill } from "react-icons/ri";
-import { FaEye } from "react-icons/fa6";
-import { FaSearch } from "react-icons/fa";
 import { GiCompactDisc } from "react-icons/gi";
 import { IoAlbumsOutline, IoPersonOutline } from "react-icons/io5";
 import { useState } from "react";
@@ -17,7 +14,7 @@ export default function Sidebar() {
 
 
     return (
-        <div className="w-64 h-full bg-transparent p-2 fixed left-0 top-0 z-100 rounded-tr-3xl mr-4 border-purple-500/50">
+        <div className="w-64 h-full bg-transparent p-2 fixed left-0 top-0 z-100 rounded-tr-3xl mr-4 border-purple-500/50 mt-">
             <div className="flex justify-center mb-2">
                 <img
                     className="w-45 h-25 rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]"
