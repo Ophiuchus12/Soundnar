@@ -1,19 +1,20 @@
 import { Form, useActionData, useNavigate } from "@remix-run/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaArrowLeft } from "react-icons/fa6";
 import {
     ActionFunction,
     LoaderFunction,
     redirect,
+    json
 } from "@remix-run/node";
 import { commitSession, getSession } from "~/session.server";
-import { verify } from "~/lib/User";
+import { login, register, verify } from "~/lib/User";
 import animationData from "../../assets/dataMusic.json";
 import { useLottie } from "lottie-react";
 
 
 export const loader: LoaderFunction = async ({ request }) => {
-    const session = await getSession(request.headers.get("Cookies"));
+    const session = await getSession(request.headers.get("Cookie"));
     const token = session.get("authToken");
 
     if (token) {
@@ -33,20 +34,105 @@ export const loader: LoaderFunction = async ({ request }) => {
     return null;
 };
 
-// export const action ActionFunction = async({ request }=> {
-//     const session = await getSession(request.headers.get("Cookie"));
-//     const formData = await request.formData();
+export const action: ActionFunction = async ({ request }) => {
+    const session = await getSession(request.headers.get("Cookie"));
+    const formData = await request.formData();
 
-//     const activetab = formData.get("activeTab") as "login" | "signup";
-//     const username = formData.get("username") as string;
-//     const password = formData.get("password") as string;
-//     const confirmPassword = formData.get("confirmPassword") as string;
+    const activeTab = formData.get("activeTab") as "login" | "signup";
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
 
-// });
+    console.log("data input", session, username, password, confirmPassword)
+
+    const errors: Record<string, string> = {}
+
+    if (!username) {
+        errors.username = "Username is required";
+    } else if (username.length < 4) {
+        errors.username = "Username should be at least 4 characters long";
+    }
+
+    const passwordRegex = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{8,}$/
+
+    if (!password) {
+        errors.password = "Password is required";
+    } else if (!passwordRegex.test(password)) {
+        errors.password = "Password must contain at least 8 characters, including one uppercase letter, one lowercase letter, and one number";
+    }
+
+    if (activeTab === "signup") {
+        if (!confirmPassword) {
+            errors.confirmPassword = "Confirm password is required";
+        } else if (password !== confirmPassword) {
+            errors.confirmPassword = "Passwords do not match";
+        }
+    }
+
+    if (Object.keys(errors).length > 0) {
+        return json({ errors }, { status: 400 });
+    }
+
+    try {
+        let token: string | undefined
+
+        if (activeTab === "login") {
+            const result = await login(username, password);
+            if (!result) {
+                return json(
+                    { errors: { server: "Invalid username or password" } },
+                    { status: 400 }
+                );
+            }
+            token = result.token;
+        } else if (activeTab === "signup") {
+            const result = await register(username, password);
+
+            if (result && (result as any).error === "USERNAME_TAKEN") {
+                return json(
+                    { errors: { username: "Username is already taken" } },
+                    { status: 400 }
+                );
+            }
+            if (!result || !result.token) {
+                return json(
+                    { errors: { server: "Failed to register. Please try again." } },
+                    { status: 400 }
+                );
+            }
+            token = result.token;
+        }
+
+        //stocker le token dans la session 
+        session.set("authToken", token);
+
+        // Supprimer tous les cookies qui commencent par "player_"
+        for (const key of Object.keys(session.data)) {
+            if (key.startsWith("player_")) {
+                session.unset(key);
+            }
+        }
+
+        const headers = new Headers({
+            "Set-Cookie": await commitSession(session),
+        });
+
+        return redirect("/", { headers });
+    } catch (error: unknown) {
+        console.error(error);
+
+        let errorMessage = "An unexpected error occurred.";
+
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        }
+
+        return json({ errors: { server: errorMessage } }, { status: 500 });
+    }
+
+};
 
 export default function Auth() {
-
-    const [isAnimationComplete, setIsAnimationComplete] = useState(true);
 
     const options = {
         animationData: animationData,
@@ -59,7 +145,6 @@ export default function Auth() {
 
     const actionData = useActionData<typeof action>();
     const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
-    const navigate = useNavigate();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -84,6 +169,14 @@ export default function Auth() {
     const goHome = () => {
         window.history.back();
     }
+
+    useEffect(() => {
+        if (actionData?.errors) {
+            setErrors(actionData.errors);
+        } else {
+            setErrors({});
+        }
+    }, [actionData]);
 
 
     return (
@@ -116,12 +209,6 @@ export default function Auth() {
                         <input type="hidden" name="activeTab" value={activeTab} />
 
                         <div>
-                            <label
-                                htmlFor="username"
-                                className="block text-sm font-medium text-gray-400 mb-1"
-                            >
-                                Username
-                            </label>
                             <input
                                 type="text"
                                 name="username"
@@ -135,12 +222,6 @@ export default function Auth() {
 
                         {/* Password Field */}
                         <div>
-                            <label
-                                htmlFor="password"
-                                className="block text-sm font-medium text-gray-400 mb-1"
-                            >
-                                Password
-                            </label>
                             <input
                                 type="password"
                                 name="password"
@@ -184,10 +265,14 @@ export default function Auth() {
                                 loading ||
                                 !username ||
                                 !password ||
-                                (activeTab === "signup" || password === confirmPassword)
+                                (activeTab === "signup" && password !== confirmPassword)
                             }
                         >
-                            {activeTab === "signup" ? "Login here" : "Sign up here"}
+                            {loading
+                                ? "Loading..."
+                                : activeTab === "signup"
+                                    ? "Sign Up"
+                                    : "Login"}{" "}
                         </button>
 
                     </Form>
