@@ -418,7 +418,7 @@ export interface PlaylistSearch {
 export interface User {
     idUser: string;
     username: string;
-    password: string;
+    mdp: string;
 }
 
 export interface UserResponse {

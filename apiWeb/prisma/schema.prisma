@@ -9,7 +9,7 @@ generator client {
 
 model User {
   id        String     @id @default(uuid())
-  pseudo    String     @unique
+  username  String     @unique
   mdp       String
   createdAt DateTime   @default(now())
   updatedAt DateTime?  @updatedAt
