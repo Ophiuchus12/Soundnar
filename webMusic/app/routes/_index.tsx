@@ -1,12 +1,12 @@
 import "../styles/index.css";
 import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist, searchGlobal } from "../lib/Music";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, Genre, Track } from "../types";
 import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
-import { LoaderFunction } from "@remix-run/node";
+import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { commitSession, getSession } from "~/session.server";
 import { getMe, verify } from "~/lib/User";
 
@@ -89,6 +89,26 @@ export const loader: LoaderFunction = async ({ request }) => {
     );
   }
 };
+
+
+export const action: ActionFunction = async ({ request }) => {
+  const session = await getSession(request.headers.get("Cookie"));
+  const formData = await request.formData();
+
+  //get value
+  const _logout = formData.get("_logout");
+
+  if (_logout) {
+    session.unset("authToken");
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: "/",
+        "Set-Cookie": await commitSession(session),
+      },
+    })
+  }
+}
 
 
 export default function Index() {
@@ -177,19 +197,23 @@ export default function Index() {
                 <GiMusicSpell className="w-6 h-6 mr-2" />
                 <span>Hello {userName ? userName : "Guest"}</span>
               </div>
-              <button
-                onClick={() => {
-                  /* Logout logic */
-                }}
-                className="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-red-600 transition"
-              >
-                Logout
-              </button>
+              <Form method="post">
+                <button
+                  type="submit"
+                  name="_logout"
+                  value="true"
+                  className="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-red-600 transition"
+                >
+                  Logout
+                </button>
+              </Form>
             </div>
+
+
           )}
 
         </div>
-      </header>
+      </header >
       <div className="mx-auto px-4 fade-in">
 
         {/* Affichage des résultats */}
