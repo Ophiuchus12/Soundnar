@@ -82,11 +82,7 @@ export default function Albums() {
                     </div>
                 ) : (
                     <div className="text-center mt-12">
-                        <img
-                            src="https://via.placeholder.com/150"
-                            alt="No album illustration"
-                            className="w-40 h-40 mx-auto mb-6 opacity-70"
-                        />
+
                         <h2 className="text-2xl text-white font-semibold mb-4">
                             Oops! No albums found
                         </h2>
