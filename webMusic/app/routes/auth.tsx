@@ -182,24 +182,26 @@ export default function Auth() {
     return (
         <div className="w-full h-full flex flex-col bg-black fade-in">
             {/* Back Button */}
-            <div className="absolute">
+            <div className=" flex ml-8">
                 <button
-                    onClick={goHome}
-                    className="text-white text-3xl p-2 rounded-full bg-[#6a00ab] hover:bg-[#3b1d79] transition-all"
+                    onClick={(goHome)}
+                    className=" text-white text-3xl p-2 rounded-full bg-[#6a00ab] hover:bg-[#3b1d79] transition-all z-40"
                     aria-label="Go back to home"
                 >
                     <FaArrowLeft />
                 </button>
-            </div>
 
-            <div className="absolute inset-0 z-0 overflow-hidden">
+            </div>
+            {/* pointer-events-none au conteneur animé. Cela empêche ce conteneur de capturer les interactions utilisateur 
+            (clics, hover, etc.), laissant les autres éléments interagir normalement. */}
+            <div className=" absolute inset-0 z-0 overflow-hidden pointer-events-none">
                 <div className="w-full h-full">
                     {home.View}
                 </div>
             </div>
 
             {/* Centered Form Container */}
-            <div className="flex items-center justify-center h-full z-10">
+            <div className="relative flex items-center justify-center h-full">
                 <div className="w-full max-w-lg bg-[#1a1a1a] rounded-lg shadow-lg p-6 text-white">
                     <h2 className="text-xl font-semibold text-center mb-4 text-white">
                         {activeTab === "login" ? "Welcome Back" : "Welcome"}
@@ -218,6 +220,9 @@ export default function Auth() {
                                 onChange={(e) => setUsername(e.target.value)}
                                 className="w-full p-3 rounded-md bg-[#2b2b2b] border border-[#3b3b3b] text-white focus:outline-none focus:ring-2 focus:ring-purple-600"
                             />
+                            {errors.username && (
+                                <p className="text-red-500 text-xs">{errors.username}</p>
+                            )}
                         </div>
 
                         {/* Password Field */}

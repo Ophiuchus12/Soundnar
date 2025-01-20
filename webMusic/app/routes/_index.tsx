@@ -1,14 +1,14 @@
 import "../styles/index.css";
 import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist, searchGlobal } from "../lib/Music";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, Genre, Track } from "../types";
 import { useEffect, useState } from "react";
 import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
-import { LoaderFunction } from "@remix-run/node";
+import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { commitSession, getSession } from "~/session.server";
-import { verify } from "~/lib/User";
+import { getMe, verify } from "~/lib/User";
 
 export const loader: LoaderFunction = async ({ request }) => {
   // Handle session and authentication
@@ -21,9 +21,17 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   let isAuthenticated = undefined;
+  let userName = null;
   if (token) {
     isAuthenticated = await verify(token);
+    const response = await getMe(token);
+    console.log(response);
+    if (response?.user) {
+      userName = response.user.username;
+    }
   }
+
+  console.log("nom", userName);
 
   // Fetch required data
   try {
@@ -42,7 +50,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     return new Response(
       JSON.stringify({
         isAuthenticated,
+        token,
         error,
+        userName,
         albums: chartAlbum.data,
         artists: chartArtist.data,
         tracks: chartTrack.data,
@@ -61,6 +71,8 @@ export const loader: LoaderFunction = async ({ request }) => {
     return new Response(
       JSON.stringify({
         isAuthenticated,
+        token,
+        userName,
         error: error,
         albums: [],
         artists: [],
@@ -79,15 +91,39 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 
+export const action: ActionFunction = async ({ request }) => {
+  const session = await getSession(request.headers.get("Cookie"));
+  const formData = await request.formData();
+
+  //get value
+  const _logout = formData.get("_logout");
+
+  if (_logout) {
+    session.unset("authToken");
+    return new Response(null, {
+      status: 303,
+      headers: {
+        Location: "/",
+        "Set-Cookie": await commitSession(session),
+      },
+    })
+  }
+}
+
+
 export default function Index() {
-  const { albums, artists, tracks, genres, isAuthenticated, error } = useLoaderData<{
+  const { albums, artists, tracks, genres, isAuthenticated, token, userName, error } = useLoaderData<{
     albums: Album[];
     artists: Artist[];
     tracks: Track[];
     genres: Genre[];
     isAuthenticated: boolean;
+    token: string | null;
+    userName: string | null;
     error: string | null;
   }>();
+
+
 
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -156,15 +192,28 @@ export default function Index() {
               Login
             </button>
           ) : (
-            <button
-              //onClick={() => navigate("/auth")}
-              className="bg-white text-purple-600 font-semibold px-4 py-2 rounded-lg shadow hover:bg-purple-600 hover:text-white transition"
-            >
-              Logout
-            </button>)}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center bg-white text-purple-600 px-3 py-1 rounded-full shadow">
+                <GiMusicSpell className="w-6 h-6 mr-2" />
+                <span>Hello {userName ? userName : "Guest"}</span>
+              </div>
+              <Form method="post">
+                <button
+                  type="submit"
+                  name="_logout"
+                  value="true"
+                  className="bg-red-500 text-white font-semibold px-4 py-2 rounded-lg shadow hover:bg-red-600 transition"
+                >
+                  Logout
+                </button>
+              </Form>
+            </div>
+
+
+          )}
 
         </div>
-      </header>
+      </header >
       <div className="mx-auto px-4 fade-in">
 
         {/* Affichage des résultats */}
