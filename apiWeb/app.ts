@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import musicRoutes from "./routes/music";
 import userRoutes from "./routes/user";
+import playlistRoutes from "./routes/playlist";
 
 const app = express();
 const PORT = 3000;
@@ -16,6 +17,7 @@ app.use(express.json());
 
 app.use("/api/music", musicRoutes);
 app.use("/api/user", userRoutes);
+app.use("/api/playlist", playlistRoutes);
 
 
 
