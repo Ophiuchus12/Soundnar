@@ -4,6 +4,10 @@ import { GiCompactDisc } from "react-icons/gi";
 import { IoAlbumsOutline, IoPersonOutline } from "react-icons/io5";
 import { useState } from "react";
 
+
+
+
+
 export default function Sidebar() {
 
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);

@@ -7,7 +7,7 @@ export async function login(username: string, password: string): Promise<UserRes
 
     const body = { username, password };
 
-    console.log("login", body);
+    //console.log("login", body);
 
     try {
         const response = await fetch(URL, {

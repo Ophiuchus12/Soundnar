@@ -426,3 +426,10 @@ export interface UserResponse {
     user?: User;
     token?: string;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+//Playlist part
+
+
+export interface responsePlaylistCreation { }

@@ -25,13 +25,13 @@ export const loader: LoaderFunction = async ({ request }) => {
   if (token) {
     isAuthenticated = await verify(token);
     const response = await getMe(token);
-    console.log(response);
+    //console.log(response);
     if (response?.user) {
       userName = response.user.username;
     }
   }
 
-  console.log("nom", userName);
+  //console.log("nom", userName);
 
   // Fetch required data
   try {
