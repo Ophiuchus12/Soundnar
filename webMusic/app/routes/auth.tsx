@@ -43,7 +43,7 @@ export const action: ActionFunction = async ({ request }) => {
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
 
-    console.log("data input", session, username, password, confirmPassword)
+    //console.log("data input", session, username, password, confirmPassword)
 
     const errors: Record<string, string> = {}
 
@@ -149,9 +149,9 @@ export default function Auth() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [errors, setErrors] = useState<{
-        username?: string | null;
-        password?: string | null;
-        confirmPassword?: string | null;
+        username?: string;
+        password?: string;
+        confirmPassword?: string;
         server?: string;
     }>({});
 
@@ -256,6 +256,10 @@ export default function Auth() {
                                     <p className="text-red-500 text-xs">{errors.confirmPassword}</p>
                                 )}
                             </div>
+                        )}
+
+                        {errors.server && (
+                            <p className="text-red-500 mt-2">{errors.server}</p>
                         )}
 
                         <button
