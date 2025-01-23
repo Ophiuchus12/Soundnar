@@ -447,4 +447,9 @@ export interface responsePlaylistCreation {
     playlist: PlaylistPerso;
 }
 
-export interface addTrackResponse { }
+export interface addTrackResponse {
+    message: string;
+}
+
+
+export interface deleteTrackPlaylistResponse { }
