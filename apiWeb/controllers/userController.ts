@@ -15,7 +15,7 @@ export async function login(req: Request, res: Response): Promise<void> {
             where: { username: username },
         });
 
-        console.log("User", user);
+        //console.log("User", user);
 
         if (!user) {
             res.status(401).json({ message: "Utilisateur non trouvé" });
@@ -31,7 +31,7 @@ export async function login(req: Request, res: Response): Promise<void> {
 
         // Générer un jeton JWT pour l'utilisateur authentifié
         const token = jwt.sign(
-            { id: user.id, username: user.username }, // Charge utile du jeton (données encodées)
+            { id: user.idUser, username: user.username }, // Charge utile du jeton (données encodées)
             JWT_SECRET, // Clé secrète utilisée pour signer le jeton
             { expiresIn: "10h" } // Durée de validité du jeton
         );
@@ -39,7 +39,7 @@ export async function login(req: Request, res: Response): Promise<void> {
         // Répondre avec un statut 200 (OK) et inclure les informations de l'utilisateur et le jeton dans la réponse
         res.status(200).json({
             message: "Connexion réussie.", // Message de confirmation
-            user: { id: user.id, username: user.username }, // Informations publiques sur l'utilisateur
+            user: { id: user.idUser, username: user.username }, // Informations publiques sur l'utilisateur
             token, // Jeton JWT pour authentification future
         });
     } catch (error) {
@@ -71,13 +71,13 @@ export async function register(req: Request, res: Response): Promise<void> {
             data: { username: username, mdp: hashedPassword },
         });
 
-        const token = jwt.sign({ id: user.id, email: user.username }, JWT_SECRET, {
+        const token = jwt.sign({ id: user.idUser, email: user.username }, JWT_SECRET, {
             expiresIn: "1h",
         });
 
         res.status(201).json({
             message: "Utilisateur enregistré avec succès.",
-            user: { id: user.id, email: user.username },
+            user: { id: user.idUser, email: user.username },
             token,
         });
 
@@ -118,7 +118,7 @@ export async function updateUserData(req: Request, res: Response): Promise<void>
         }
 
         const user = await prisma.user.findUnique({
-            where: { id: userId },
+            where: { idUser: userId },
         });
 
         if (!user) {
@@ -133,7 +133,7 @@ export async function updateUserData(req: Request, res: Response): Promise<void>
                 where: { username: username }
             })
 
-            if (existingUser && existingUser.id !== userId) {
+            if (existingUser && existingUser.idUser !== userId) {
                 res.status(409).json({ message: "Utilisateur déjà existant." });
                 return;
             }
@@ -147,14 +147,14 @@ export async function updateUserData(req: Request, res: Response): Promise<void>
         }
 
         const updatedUser = await prisma.user.update({
-            where: { id: userId },
+            where: { idUser: userId },
             data: updateData,
         })
 
         res.status(200).json({
             message: "Utilisateur mis à jour avec succès.",
             user: {
-                id: updatedUser.id,
+                idUser: updatedUser.idUser,
                 username: updatedUser.username,
                 updatedAt: updatedUser.createdAt
             }

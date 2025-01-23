@@ -16,6 +16,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const token = session.get("authToken");
   const error = session.get("error") || null;
 
+  console.log("sessiion", token)
+
   if (error) {
     session.unset("error");
   }
@@ -24,7 +26,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   let userName = null;
   if (token) {
     isAuthenticated = await verify(token);
+    console.log(isAuthenticated)
     const response = await getMe(token);
+    console.log(response)
     //console.log(response);
     if (response?.user) {
       userName = response.user.username;
@@ -123,6 +127,7 @@ export default function Index() {
     error: string | null;
   }>();
 
+  console.log("test", isAuthenticated)
 
 
   const [searchValue, setSearchValue] = useState('');
