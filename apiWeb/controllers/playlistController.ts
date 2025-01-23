@@ -144,14 +144,55 @@ export async function addTrack(req: Request, res: Response): Promise<void> {
 }
 
 
-// model Track {
-//     idTrack       String     @id @default(uuid())
-//     idTrackDeezer String
-//     title         String
-//     duration      Int
-//     preview       String
-//     md5Image      String
-//     artistId      String
-//     albumId       String
-//     playlists     Playlist[]
-//   }
+export async function deleteTrackPlaylist(req: Request, res: Response): Promise<void> {
+    const { idPlaylist, idTrack } = req.body;
+
+    // Validation des paramètres
+    if (!idPlaylist || typeof idPlaylist !== "string") {
+        res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
+        return;
+    }
+
+    if (!idTrack || typeof idTrack !== "string") {
+        res.status(400).json({ message: "L'identifiant de la piste dans la playlist est invalide." });
+        return;
+    }
+
+    try {
+        // Récupération de la playlist et des chansons associées
+        const playlist = await prisma.playlist.findUnique({
+            where: { idPlaylist },
+            include: { songs: true }, // Inclure les chansons associées à la playlist
+        });
+
+        if (!playlist) {
+            res.status(404).json({ message: "La playlist n'a pas été trouvée." });
+            return;
+        }
+
+        // Vérifier si la chanson est présente dans la playlist
+        const track = playlist.songs.find((song) => song.idTrack === idTrack);
+
+        if (!track) {
+            res.status(404).json({ message: "La chanson n'est pas présente dans la playlist." });
+            return;
+        }
+
+        // Suppression de la chanson de la playlist
+        await prisma.playlist.update({
+            where: { idPlaylist },
+            data: {
+                songs: {
+                    disconnect: { idTrack: track.idTrack },
+                },
+                nbTracks: playlist.nbTracks - 1, // Décrémenter le nombre de chansons
+                tempsPlaylist: playlist.tempsPlaylist - track.duration, // Réduire le temps total de la playlist
+            },
+        });
+
+        res.status(200).json({ message: "La chanson a été supprimée de la playlist avec succès." });
+    } catch (err) {
+        console.error("Erreur dans deleteTrackPlaylist:", err);
+        res.status(500).json({ message: "Erreur serveur lors de la suppression de la chanson." });
+    }
+}
