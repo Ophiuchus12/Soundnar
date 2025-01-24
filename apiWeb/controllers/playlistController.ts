@@ -196,3 +196,27 @@ export async function deleteTrackPlaylist(req: Request, res: Response): Promise<
         res.status(500).json({ message: "Erreur serveur lors de la suppression de la chanson." });
     }
 }
+
+
+
+export async function deletePlaylist(req: Request, res: Response): Promise<void> {
+    const { idPlaylist } = req.params;
+
+    if (!idPlaylist || typeof idPlaylist !== "string") {
+        res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
+        return;
+    }
+
+    try {
+        // Suppression de la playlist
+        const deletedPlaylist = await prisma.playlist.delete({
+            where: { idPlaylist },
+        });
+
+        // Renvoi d'une réponse réussie
+        res.status(200).json({ message: "La playlist a été supprimée avec succès.", playlist: deletedPlaylist });
+    } catch (error) {
+        console.error("Erreur dans deletePlaylist:", error);
+        res.status(500).json({ message: "Erreur serveur lors de la suppression de la playlist." });
+    }
+}
