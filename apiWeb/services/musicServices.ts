@@ -1,5 +1,5 @@
 import axios from "axios";
-import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData, SearchResult, DeezerGlobal, ArtistSearch, AlbumSearch, TrackSearch, PlaylistSearch, SearchType, ArtistTopSongList } from '../interfaces/interface'
+import { chartAlbumResponse, chartArtistResponse, chartTracksresponse, genreResponse, artistsByGenreResponse, AlbumDetail, ArtistDetail, ArtistDetailAlbumList, DeezerSearchResponse, ArtistSearchData, SearchResult, DeezerGlobal, ArtistSearch, AlbumSearch, TrackSearch, PlaylistSearch, SearchType, ArtistTopSongList, TrackData } from '../interfaces/interface'
 
 
 
@@ -177,3 +177,13 @@ export async function fetchSearchArtist(searchData: string): Promise<ArtistSearc
 }
 
 
+export async function fetchTrack(idTrack: number): Promise<TrackData | null> {
+    try {
+        const url = `https://api.deezer.com/track/${idTrack}`;
+        const response = await axios.get<TrackData>(url);
+        return response.data;
+    } catch (err) {
+        console.error('Erreur dans fetchTrack:', err);
+        return null;
+    }
+}

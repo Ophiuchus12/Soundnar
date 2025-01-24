@@ -431,5 +431,34 @@ export interface UserResponse {
 ///////////////////////////////////////////////////////////////////////////////////////
 //Playlist part
 
+export interface PlaylistPerso {
+    idPlaylist: string;
+    title: string;
+    nbTracks: number;
+    tempsPlaylist: number;
+    isPublic: boolean;
+    createdAt: string;
+    updatedAt: string;
+    authorId: string;
+}
 
-export interface responsePlaylistCreation { }
+export interface responsePlaylistCreation {
+    message: string;
+    playlist: PlaylistPerso;
+}
+
+export interface addTrackResponse {
+    message: string;
+}
+
+
+export interface deleteTrackPlaylistResponse {
+    message: string;
+}
+
+export interface deletePlaylistResponse {
+    message: string;
+    playlist: PlaylistPerso;
+}
+
+export interface updatePlaylistResponse { }

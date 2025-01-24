@@ -3,7 +3,6 @@ import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist
 import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, Genre, Track } from "../types";
 import { useEffect, useState } from "react";
-import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
@@ -16,6 +15,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   const token = session.get("authToken");
   const error = session.get("error") || null;
 
+  console.log("sessiion", token)
+
   if (error) {
     session.unset("error");
   }
@@ -24,7 +25,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   let userName = null;
   if (token) {
     isAuthenticated = await verify(token);
+    console.log(isAuthenticated)
     const response = await getMe(token);
+    console.log(response)
     //console.log(response);
     if (response?.user) {
       userName = response.user.username;
@@ -123,6 +126,7 @@ export default function Index() {
     error: string | null;
   }>();
 
+  console.log("test", isAuthenticated)
 
 
   const [searchValue, setSearchValue] = useState('');

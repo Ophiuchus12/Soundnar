@@ -8,7 +8,7 @@ generator client {
 }
 
 model User {
-  id        String     @id @default(uuid())
+  idUser    String     @id @default(uuid())
   username  String     @unique
   mdp       String
   createdAt DateTime   @default(now())
@@ -17,44 +17,43 @@ model User {
 }
 
 model Playlist {
-  id            String   @id @default(uuid())
+  idPlaylist    String   @id @default(uuid())
   title         String
-  nbTitres      Int
-  tempsPlaylist Int
-  isPublic      Boolean
+  nbTracks      Int      @default(0)
+  tempsPlaylist Int      @default(0)
+  isPublic      Boolean  @default(false)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   authorId      String
-  author        User     @relation(fields: [authorId], references: [id])
+  author        User     @relation(fields: [authorId], references: [idUser])
   songs         Track[]
 }
 
 model Track {
-  id        String     @id @default(uuid())
-  title     String
-  duration  Int
-  preview   String
-  md5Image  String
-  artistId  String?
-  artist    Artist?    @relation(fields: [artistId], references: [id])
-  albumId   String?
-  album     Album?     @relation(fields: [albumId], references: [id])
-  playlists Playlist[]
+  idTrack       String     @id @default(uuid())
+  idTrackDeezer Int        @unique
+  title         String
+  duration      Int
+  preview       String
+  md5Image      String
+  artistId      Int
+  albumId       Int
+  playlists     Playlist[]
 }
 
-model Artist {
-  id     String  @id @default(uuid())
-  name   String
-  type   String
-  albums Album[]
-  tracks Track[]
-}
+// model Artist {
+//   idArtist String  @id @default(uuid())
+//   name     String
+//   type     String
+//   albums   Album[]
+//   tracks   Track[]
+// }
 
-model Album {
-  id       String  @id @default(uuid())
-  title    String
-  artistId String
-  artist   Artist  @relation(fields: [artistId], references: [id])
-  type     String
-  tracks   Track[]
-}
+// model Album {
+//   idAlbum  String  @id @default(uuid())
+//   title    String
+//   artistId String
+//   artist   Artist  @relation(fields: [artistId], references: [idArtist])
+//   type     String
+//   tracks   Track[]
+// }
