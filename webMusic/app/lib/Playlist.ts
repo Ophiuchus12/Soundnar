@@ -1,4 +1,4 @@
-import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse } from "~/types";
+import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -92,6 +92,23 @@ export async function updatePlaylist(idPlaylist: string, title: string): Promise
         return await response.json() as updatePlaylistResponse;
     } catch (error) {
         console.error("Erreur dans la mise à jour d'une playliste", error);
+        return null;
+    }
+}
+
+export async function getAllPlaylists(): Promise<playlistAllResponse | null> {
+    const URL = `{url}/api/playlist/allPlaylists`;
+    try {
+        const response = await fetch(URL, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            }
+        });
+        if (!response.ok) throw new Error("Erreur lors de la récupération de toutes les playlists");
+        return await response.json() as playlistAllResponse;
+    } catch (error) {
+        console.error("Erreur dans la récupération de toutes les playlists", error);
         return null;
     }
 }

@@ -461,4 +461,9 @@ export interface deletePlaylistResponse {
     playlist: PlaylistPerso;
 }
 
-export interface updatePlaylistResponse { }
+export interface updatePlaylistResponse {
+    message: string;
+    playlist: PlaylistPerso;
+}
+
+export interface playlistAllResponse { }
