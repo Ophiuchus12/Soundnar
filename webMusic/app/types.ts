@@ -440,6 +440,19 @@ export interface PlaylistPerso {
     createdAt: string;
     updatedAt: string;
     authorId: string;
+    songs: TrackPerso[]
+}
+
+export interface TrackPerso {
+    idTrack: string;
+    idTrackDeezer: number;
+    title: string;
+    duration: number;
+    preview: string;
+    md5Image: string;
+    artistId: number;
+    albumId: number;
+
 }
 
 export interface responsePlaylistCreation {
@@ -461,4 +474,15 @@ export interface deletePlaylistResponse {
     playlist: PlaylistPerso;
 }
 
-export interface updatePlaylistResponse { }
+export interface updatePlaylistResponse {
+    message: string;
+    playlist: PlaylistPerso;
+}
+
+export interface playlistAllResponse {
+    playlists: PlaylistPerso[];
+}
+
+export interface playlistIdResponse {
+    playlist: PlaylistPerso;
+}
