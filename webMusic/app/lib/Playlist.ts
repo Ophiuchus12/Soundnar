@@ -1,4 +1,4 @@
-import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse } from "~/types";
+import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -73,6 +73,25 @@ export async function deletePlaylist(idPlaylist: string): Promise<deletePlaylist
         return await response.json() as deletePlaylistResponse;
     } catch (error) {
         console.error("Erreur dans la suppression d'une playliste", error);
+        return null;
+    }
+}
+
+export async function updatePlaylist(idPlaylist: string, title: string): Promise<updatePlaylistResponse | null> {
+    const URL = `{url}/api/playlist/updatePlaylist/${idPlaylist}`;
+    const body = { title };
+    try {
+        const response = await fetch(URL, {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        })
+        if (!response.ok) throw new Error("Erreur lors de la mise à jour de la playliste");
+        return await response.json() as updatePlaylistResponse;
+    } catch (error) {
+        console.error("Erreur dans la mise à jour d'une playliste", error);
         return null;
     }
 }

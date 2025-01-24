@@ -1,6 +1,6 @@
 # 🎵 Soundnar - Votre plateforme musicale tout-en-un
 
-Soundnar est une application web moderne qui vous permet d'explorer l'univers de la musique. Découvrez vos morceaux, albums et artistes préférés, et profitez de fonctionnalités interactives comme la création de playlists et la gestion de favoris. Grâce à un système d'authentification sécurisé, chaque utilisateur peut personnaliser son expérience musicale.
+Soundnar est une application web moderne qui vous permet d'explorer l'univers de la musique. Grâce à l'utilisation dde l'api de deezer, découvrez vos morceaux, albums et artistes préférés, et profitez de fonctionnalités interactives comme la création de playlists et la gestion de favoris. Grâce à un système d'authentification sécurisé, chaque utilisateur peut personnaliser son expérience musicale.
 
 ---
 
