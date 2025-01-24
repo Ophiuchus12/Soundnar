@@ -1,6 +1,7 @@
 import { LoaderFunction } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 import React from 'react'
+import { getAllPlaylists } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
 
@@ -37,12 +38,20 @@ export default function Playlists() {
         error: string | null;
     }>();
 
+    try {
+        //const allPlaylists = await getAllPlaylists(userId.toString());
+    } catch (err) { }
+
+
     return (
         <div className="min-h-screen text-white flex items-center justify-center">
             {isAuthenticated ? (
                 <div>
                     <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
                     <p className="text-lg mt-2">Your Playlists</p>
+                    <div className="">
+
+                    </div>
                 </div>
             ) : (
                 <div className="max-w-md text-center bg-gray-800 p-6 rounded-lg shadow-lg">

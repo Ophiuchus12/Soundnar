@@ -96,14 +96,17 @@ export async function updatePlaylist(idPlaylist: string, title: string): Promise
     }
 }
 
-export async function getAllPlaylists(): Promise<playlistAllResponse | null> {
+export async function getAllPlaylists(userId: string): Promise<playlistAllResponse | null> {
     const URL = `{url}/api/playlist/allPlaylists`;
+    const body = { userId };
     try {
         const response = await fetch(URL, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-            }
+            },
+            body: JSON.stringify(body),
+
         });
         if (!response.ok) throw new Error("Erreur lors de la récupération de toutes les playlists");
         return await response.json() as playlistAllResponse;

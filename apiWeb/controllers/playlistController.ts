@@ -256,14 +256,26 @@ export async function updatePlaylist(req: Request, res: Response): Promise<void>
 
 
 export async function getAllPlaylists(req: Request, res: Response): Promise<void> {
+    const { userId } = req.body;
+
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
     try {
-        const playlists = await prisma.playlist.findMany();
+        const playlists = await prisma.playlist.findMany({
+            where: { authorId: userId }, // Utiliser le champ correct du modèle
+            include: { songs: true }, // Inclure les chansons associées à la playlist
+        });
+
         res.status(200).json(playlists);
     } catch (error) {
         console.error("Erreur dans getAllPlaylists:", error);
         res.status(500).json({ message: "Erreur serveur lors de la récupération de toutes les playlists." });
     }
 }
+
 
 
 export async function getPlaylistById(req: Request, res: Response): Promise<void> {
