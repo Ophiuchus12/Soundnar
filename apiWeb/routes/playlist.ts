@@ -1,5 +1,5 @@
 import express from "express";
-import { playlistCreation, addTrack, deleteTrackPlaylist, deletePlaylist, updatePlaylist, getAllPlaylists } from "../controllers/playlistController"
+import { playlistCreation, addTrack, deleteTrackPlaylist, deletePlaylist, updatePlaylist, getAllPlaylists, getPlaylistById } from "../controllers/playlistController"
 
 const router = express.Router();
 
@@ -9,5 +9,6 @@ router.delete('/deleteTrack', deleteTrackPlaylist);
 router.delete('/deletePlaylist/:idPlaylist', deletePlaylist)
 router.put('/updatePlaylist/:idPlaylist', updatePlaylist)
 router.get('/allPlaylists', getAllPlaylists)
+router.get('/getPlaylistById/:idPlaylist', getPlaylistById)
 
 export default router;

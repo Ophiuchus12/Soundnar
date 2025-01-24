@@ -264,3 +264,26 @@ export async function getAllPlaylists(req: Request, res: Response): Promise<void
         res.status(500).json({ message: "Erreur serveur lors de la récupération de toutes les playlists." });
     }
 }
+
+
+export async function getPlaylistById(req: Request, res: Response): Promise<void> {
+    const { idPlaylist } = req.params;
+    if (!idPlaylist || typeof idPlaylist !== "string") {
+        res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
+        return;
+    }
+    try {
+        const playlist = await prisma.playlist.findUnique({
+            where: { idPlaylist },
+            include: { songs: true }, // Inclure les chansons associées à la playlist
+        })
+        if (!playlist) {
+            res.status(404).json({ message: "La playlist n'a pas été trouvée." });
+            return;
+        }
+        res.status(200).json(playlist);
+    } catch (error) {
+        console.error("Erreur dans getPlaylistId", error);
+        res.status(500).json({ message: "Erreur serveur lors de la récupération de la playlist." });
+    }
+}
