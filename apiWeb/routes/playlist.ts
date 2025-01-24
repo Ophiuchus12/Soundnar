@@ -8,7 +8,7 @@ router.post('/addTrack', addTrack);
 router.delete('/deleteTrack', deleteTrackPlaylist);
 router.delete('/deletePlaylist/:idPlaylist', deletePlaylist)
 router.put('/updatePlaylist/:idPlaylist', updatePlaylist)
-router.get('/allPlaylists', getAllPlaylists)
+router.post('/allPlaylists', getAllPlaylists)
 router.get('/getPlaylistById/:idPlaylist', getPlaylistById)
 
 export default router;

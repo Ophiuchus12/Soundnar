@@ -4,6 +4,14 @@ import React from 'react'
 import { getAllPlaylists } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
+import { playlistAllResponse, PlaylistPerso } from '~/types';
+
+function formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
 
 export const loader: LoaderFunction = async ({ request }) => {
     const session = await getSession(request.headers.get("Cookie"));
@@ -21,26 +29,28 @@ export const loader: LoaderFunction = async ({ request }) => {
         }
     }
 
+
     const isValid = await verify(token);
     if (!isValid) {
         return { isAuthenticated: false, error: null, token: null };
     }
+    console.log("user", userId);
+    const playlists = await getAllPlaylists(userId);
 
-    return { isAuthenticated: true, error: null, token: token, userId: userId, userName: userName };
+
+    return { isAuthenticated: true, error: null, token: token, userId: userId, userName: userName, playlists: playlists };
 }
 
 export default function Playlists() {
-    const { isAuthenticated, token, userId, error, userName } = useLoaderData<{
+    const { isAuthenticated, token, userId, error, userName, playlists } = useLoaderData<{
         isAuthenticated: boolean;
         token: string | null;
         userId: string | null;
         userName: string | null;
+        playlists: PlaylistPerso[];
         error: string | null;
     }>();
 
-    try {
-        //const allPlaylists = await getAllPlaylists(userId.toString());
-    } catch (err) { }
 
 
     return (
@@ -49,8 +59,25 @@ export default function Playlists() {
                 <div>
                     <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
                     <p className="text-lg mt-2">Your Playlists</p>
-                    <div className="">
-
+                    <div className="mt-4">
+                        {playlists.length > 0 ? (
+                            playlists.map((playlist) => (
+                                <div
+                                    key={playlist.idPlaylist}
+                                    className="my-2 bg-gray-800 p-4 rounded-lg shadow"
+                                >
+                                    <h2 className="text-xl font-semibold">{playlist.title}</h2>
+                                    <p className="text-sm text-gray-400">
+                                        {playlist.nbTracks} tracks
+                                    </p>
+                                    <p className="text-sm text-gray-400">
+                                        {formatTime(playlist.tempsPlaylist)} minutes
+                                    </p>
+                                </div>
+                            ))
+                        ) : (
+                            <p className="text-gray-400">You don't have any playlists yet.</p>
+                        )}
                     </div>
                 </div>
             ) : (
@@ -79,4 +106,3 @@ export default function Playlists() {
         </div>
     );
 }
-
