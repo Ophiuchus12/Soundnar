@@ -3,7 +3,6 @@ import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist
 import { Form, useLoaderData, useNavigate } from "@remix-run/react";
 import { Album, Artist, Genre, Track } from "../types";
 import { useEffect, useState } from "react";
-import SearchBar from "../components/SearchBar";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";

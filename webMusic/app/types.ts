@@ -452,4 +452,11 @@ export interface addTrackResponse {
 }
 
 
-export interface deleteTrackPlaylistResponse { }
+export interface deleteTrackPlaylistResponse {
+    message: string;
+}
+
+export interface deletePlaylistResponse {
+    message: string;
+    playlist: PlaylistPerso;
+}
