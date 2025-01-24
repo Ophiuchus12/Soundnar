@@ -220,3 +220,36 @@ export async function deletePlaylist(req: Request, res: Response): Promise<void>
         res.status(500).json({ message: "Erreur serveur lors de la suppression de la playlist." });
     }
 }
+
+
+export async function updatePlaylist(req: Request, res: Response): Promise<void> {
+    const { idPlaylist } = req.params;
+    const { title } = req.body;
+
+    if (!idPlaylist || typeof idPlaylist !== "string") {
+        res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
+        return;
+    }
+
+    if (!title || typeof title !== "string") {
+        res.status(400).json({ message: "Le titre de la playlist est requis." });
+        return;
+    }
+
+    try {
+        const updateResponse = await prisma.playlist.update({
+            where: { idPlaylist },
+            data: { title },
+        })
+
+        if (!updateResponse) {
+            res.status(404).json({ message: "La playlist n'a pas été trouvée." });
+            return;
+        }
+
+        res.status(200).json({ message: "Le titre de la playlist a été mis à jour avec succès.", playlist: updateResponse });
+    } catch (error) {
+        console.error("Erreur dans l'update de la playlist", error);
+        res.status(500).json({ message: "Erreur serveur lors de la mise à jour de la playlist." });
+    }
+}
