@@ -3,7 +3,7 @@ import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation
 const url = "http://localhost:3000"
 
 export async function createPlaylist(title: string, authorId: string): Promise<responsePlaylistCreation | null> {
-    const URL = `{url}/api/playlist/create`;
+    const URL = `${url}/api/playlist/create`;
     const body = { title, authorId };
     try {
         const response = await fetch(URL, {
@@ -22,7 +22,7 @@ export async function createPlaylist(title: string, authorId: string): Promise<r
 }
 
 export async function addTrack(idPlaylist: string, idTrack: number): Promise<addTrackResponse | null> {
-    const URL = `{url}/api/playlist/addTrack`;
+    const URL = `${url}/api/playlist/addTrack`;
     const body = { idPlaylist, idTrack };
     try {
         const response = await fetch(URL, {
@@ -41,7 +41,7 @@ export async function addTrack(idPlaylist: string, idTrack: number): Promise<add
 }
 
 export async function deleteTrackPlaylist(idPlaylist: string, idTrack: string): Promise<deleteTrackPlaylistResponse | null> {
-    const URL = `{url}/api/playlist/deleteTrack`;
+    const URL = `${url}/api/playlist/deleteTrack`;
     const body = { idPlaylist, idTrack };
     try {
         const response = await fetch(URL, {
@@ -61,7 +61,7 @@ export async function deleteTrackPlaylist(idPlaylist: string, idTrack: string): 
 
 
 export async function deletePlaylist(idPlaylist: string): Promise<deletePlaylistResponse | null> {
-    const URL = `{url}/api/playlist/deletePlaylist/${idPlaylist}`;
+    const URL = `${url}/api/playlist/deletePlaylist/${idPlaylist}`;
     try {
         const response = await fetch(URL, {
             method: "DELETE",
@@ -78,7 +78,7 @@ export async function deletePlaylist(idPlaylist: string): Promise<deletePlaylist
 }
 
 export async function updatePlaylist(idPlaylist: string, title: string): Promise<updatePlaylistResponse | null> {
-    const URL = `{url}/api/playlist/updatePlaylist/${idPlaylist}`;
+    const URL = `${url}/api/playlist/updatePlaylist/${idPlaylist}`;
     const body = { title };
     try {
         const response = await fetch(URL, {
@@ -97,11 +97,12 @@ export async function updatePlaylist(idPlaylist: string, title: string): Promise
 }
 
 export async function getAllPlaylists(userId: string): Promise<playlistAllResponse | null> {
-    const URL = `{url}/api/playlist/allPlaylists`;
+    const URL = `${url}/api/playlist/allPlaylists`;
     const body = { userId };
+    //console.log("json log ", JSON.stringify(body));
     try {
         const response = await fetch(URL, {
-            method: "GET",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -117,7 +118,7 @@ export async function getAllPlaylists(userId: string): Promise<playlistAllRespon
 }
 
 export async function getPlaylistById(idPlaylist: string): Promise<playlistIdResponse | null> {
-    const URL = `{url}/api/playlist/getPlaylistById/${idPlaylist}`;
+    const URL = `${url}/api/playlist/getPlaylistById/${idPlaylist}`;
     try {
         const response = await fetch(URL, {
             method: "GET",
