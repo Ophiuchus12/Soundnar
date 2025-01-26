@@ -144,3 +144,10 @@ export async function getPlaylistById(idPlaylist: string): Promise<playlistIdRes
         return null;
     }
 }
+
+
+export function formatTime(seconds: number): string {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}

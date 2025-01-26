@@ -247,10 +247,25 @@ export default function Index() {
                         <h3 className="text-white text-base font-medium">{track.title}</h3>
                         <p className="text-gray-400 text-sm">by {track.artist.name}</p>
                       </div>
-                      {/* Audio Preview */}
-                      <audio controls src={track.preview} className="ml-4 w-24">
-                        Your browser does not support the audio element.
-                      </audio>
+                      <div className="flex items-center justify-between space-x-4">
+                        <button
+                          onClick={() => handlePlayClick(track.id)}
+                          className={`rounded-full p-2 transition-all ${playingTrackId === track.id
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-800 text-2xl text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                            }`}
+                          aria-label={playingTrackId === track.id ? "Stop" : "Play"}
+                        >
+                          <GiMusicSpell />
+                        </button>
+                      </div>
+
+                      {playingTrackId === track.id && (
+                        <audio className="hidden" controls autoPlay>
+                          <source src={track.preview} type="audio/mpeg" />
+                          Votre navigateur ne supporte pas l'élément audio.
+                        </audio>
+                      )}
                     </div>
                   ))}
                 </div>
