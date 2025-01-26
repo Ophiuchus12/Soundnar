@@ -162,7 +162,7 @@ export default function Playlists() {
                 </div>
             ) : (
                 <div className="max-w-md text-center bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h1 className="text-4xl font-bold mb-4">Accès limité</h1>
+                    <h1 className="text-4xl font-bold mb-4">Limited access</h1>
                     <p className="text-lg mb-6">
                         Log in to access your playlists, manage your favorites,
                         and enjoy a personalized music experience.
