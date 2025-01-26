@@ -15,7 +15,8 @@ import {
     AlbumSearch,
     TrackSearch,
     PlaylistSearch,
-    ArtistTopSongList
+    ArtistTopSongList,
+    getOneTrackData
 } from "~/types";
 
 const url = "http://localhost:3000"
@@ -275,4 +276,24 @@ export async function searchArtist(content: string): Promise<ArtistSearchData | 
         console.error('Erreur lors de la recherche par artist : ', err);
         return null;
     }
+}
+
+
+export async function getTrackById(idTrack: number): Promise<getOneTrackData | null> {
+    const URL = `${url}/api/music/track/${idTrack}`;
+
+    try {
+        const response = await fetch(URL, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la récupération des données de la chanson');
+        return await response.json() as getOneTrackData;
+    } catch (err) {
+        console.error('Erreur lors de la récupération des données de la chanson : ', err);
+        return null;
+    }
+
 }
