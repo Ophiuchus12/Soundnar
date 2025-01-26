@@ -1,11 +1,13 @@
 import { LoaderFunction } from '@remix-run/node'
 import { useLoaderData, useNavigate } from '@remix-run/react';
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { FaArrowLeft } from 'react-icons/fa';
-import { getPlaylistById } from '~/lib/Playlist';
+import { GiMusicSpell } from 'react-icons/gi';
+import { getTrackById } from '~/lib/Music';
+import { formatTime, getPlaylistById } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server'
-import { PlaylistPerso } from '~/types';
+import { getOneTrackData, PlaylistPerso, TrackPerso } from '~/types';
 
 
 
@@ -63,7 +65,50 @@ export default function PlaylistDetails() {
     error: string | null;
   }>();
 
-  //const [tracks, setTracks] = useState([]: Track);
+
+  const [tracks, setTracks] = useState<getOneTrackData[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null); // Stocke l'ID du track en cours de lecture
+
+  const handlePlayClick = (trackId: string) => {
+    if (playingTrackId === trackId) {
+      setPlayingTrackId(null); // Arrête la chanson si c'est la même chanson
+    } else {
+      setPlayingTrackId(trackId); // Démarre la chanson si c'est une autre chanson
+    }
+  };
+
+  // Fonction pour récupérer les tracks
+  const fetchTracks = async () => {
+    if (playlist && playlist.songs.length > 0) {
+      try {
+        const trackData: getOneTrackData[] = [];
+        for (const track of playlist.songs) {
+          const res = await getTrackById(track.idTrackDeezer);
+          console.log("res", res);
+          if (res) {
+            trackData.push(res);
+          }
+        }
+        setTracks(trackData);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des tracks :", error);
+      } finally {
+        setLoading(false); // On arrête le chargement une fois les données récupérées
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchTracks();
+  }, [playlist]);
+
+
+
+
+
+
+
 
   const navigate = useNavigate();
   return (
@@ -81,13 +126,63 @@ export default function PlaylistDetails() {
           </div>
 
           {/* Contenu principal de la playlist */}
-          <div className="text-white mx-8">
-            {/* {playlist ? (
-              playlist.songs.length > 0 && (
-                playlist.songs.map()
-              )
-            ) : ()} */}
+          <div className="mx-8">
+            <div className="mb-6">
+              <h2 className="text-3xl font-bold text-white">{playlist?.title}</h2>
+              <p className="text-lg text-gray-400">{playlist?.songs.length} Tracks</p>
+              <p className="text-lg text-gray-400">{formatTime(playlist?.duration || 0)} minutes</p>
+            </div>
+
+            <div className="space-y-6">
+              {tracks.length > 0 ? (
+                tracks.map((track) => (
+                  <div
+                    key={track.id}
+                    className="bg-gray-800 p-4 rounded-lg shadow-lg flex items-center justify-between hover:bg-[#3b1d79] transition-all"
+                  >
+                    {/* Image de couverture */}
+                    <img
+                      src={`https://e-cdns-images.dzcdn.net/images/cover/${track.md5_image}/250x250-000000-80-0-0.jpg`}
+                      alt={track.title}
+                      className="w-14 h-14 object-cover rounded-lg shadow-sm"
+                    />
+
+                    {/* Infos du morceau */}
+                    <div className="flex-1 ml-4">
+                      <h3 className="text-lg font-semibold text-white truncate">{track.title}</h3>
+                      <p className="text-sm text-gray-400 truncate">by {track.artist.name}</p>
+                    </div>
+
+                    {/* Contrôles */}
+                    <div className="flex items-center space-x-4">
+                      {/* Bouton de lecture/arrêt */}
+                      <button
+                        onClick={() => handlePlayClick(track.id)}
+                        className={`rounded-full p-3 transition-all shadow-md ${playingTrackId === track.id
+                            ? "bg-purple-600 text-white"
+                            : "bg-gray-700 text-gray-400 hover:bg-purple-800 hover:text-white"
+                          }`}
+                        aria-label={playingTrackId === track.id ? "Stop" : "Play"}
+                      >
+                        <GiMusicSpell size={20} />
+                      </button>
+
+                      {/* Audio contrôlé */}
+                      {playingTrackId === track.id && (
+                        <audio className="hidden" controls autoPlay>
+                          <source src={track.preview} type="audio/mpeg" />
+                          Votre navigateur ne supporte pas l'élément audio.
+                        </audio>
+                      )}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-gray-400">No tracks found</p>
+              )}
+            </div>
           </div>
+
         </div>
       ) : (
         // Affichage si non authentifié

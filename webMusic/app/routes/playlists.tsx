@@ -1,16 +1,12 @@
 import { ActionFunction, json, LoaderFunction, redirect } from '@remix-run/node';
 import { Form, useActionData, useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
-import { createPlaylist, getAllPlaylists } from '~/lib/Playlist';
+import { createPlaylist, formatTime, getAllPlaylists } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
 import { PlaylistPerso } from '~/types';
 
-function formatTime(seconds: number): string {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-}
+
 
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -125,12 +121,13 @@ export default function Playlists() {
                 <div>
                     <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
                     <p className="text-lg mt-2">Your Playlists</p>
-                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
                         {playlists.length > 0 ? (
                             playlists.map((playlist) => (
                                 <div
                                     key={playlist.idPlaylist}
-                                    className="group relative bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                                    className="group relative bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform 
+                                    transition-transform duration-300 ease-in-out scale-100 hover:scale-110"
                                     onClick={() => handleClickPlaylist(playlist.idPlaylist)}
                                 >
                                     <h2 className="text-2xl font-semibold text-white group-hover:text-[#7600be] transition-colors duration-300">
@@ -140,7 +137,7 @@ export default function Playlists() {
                                         <span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}
                                     </p>
                                     <p className="mt-1 text-sm text-gray-400">
-                                        <span className="font-bold text-white">Duration:</span> {formatTime(playlist.tempsPlaylist)}
+                                        <span className="font-bold text-white">Duration:</span> {formatTime(playlist.duration)}
                                     </p>
                                 </div>
                             ))

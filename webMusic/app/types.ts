@@ -435,7 +435,7 @@ export interface PlaylistPerso {
     idPlaylist: string;
     title: string;
     nbTracks: number;
-    tempsPlaylist: number;
+    duration: number;
     isPublic: boolean;
     createdAt: string;
     updatedAt: string;

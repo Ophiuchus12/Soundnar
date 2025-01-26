@@ -134,7 +134,7 @@ export async function addTrack(req: Request, res: Response): Promise<void> {
                     },
                 },
                 nbTracks: playlist.nbTracks + 1,
-                tempsPlaylist: playlist.tempsPlaylist + track.duration,
+                duration: playlist.duration + track.duration,
             },
         });
 
@@ -188,7 +188,7 @@ export async function deleteTrackPlaylist(req: Request, res: Response): Promise<
                     disconnect: { idTrack: track.idTrack },
                 },
                 nbTracks: playlist.nbTracks - 1, // Décrémenter le nombre de chansons
-                tempsPlaylist: playlist.tempsPlaylist - track.duration, // Réduire le temps total de la playlist
+                duration: playlist.duration - track.duration, // Réduire le temps total de la playlist
             },
         });
 
