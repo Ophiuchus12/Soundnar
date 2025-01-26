@@ -417,7 +417,7 @@ export interface User {
 }
 
 
-export interface TrackData {
+export interface getOneTrackData {
     id: string;
     readable: boolean;
     title: string;

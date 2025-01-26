@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks, fetchAlbum, fetchArtist, fetchArtistAlbum, fetchSearchData, fetchSearchArtist, fetchTopSongArtist } from "../services/musicServices";
+import { fetchChartAlbums, fetchChartArtists, fetchGenres, fetchArtistsByGenre, fetchChartTracks, fetchAlbum, fetchArtist, fetchArtistAlbum, fetchSearchData, fetchSearchArtist, fetchTopSongArtist, fetchTrack } from "../services/musicServices";
 import { SearchType } from "../interfaces/interface";
 
 export async function getChartAlbums(_: Request, res: Response): Promise<void> {
@@ -198,5 +198,23 @@ export async function getSearchGlobal(req: Request, res: Response): Promise<void
     } catch (err) {
         console.error("Erreur lors de la recherche :", err);
         res.status(500).json({ message: "Erreur interne lors de la recherche." });
+    }
+}
+
+
+export async function getTrackById(req: Request, res: Response): Promise<void> {
+    try {
+        const trackId = parseInt(req.params.id);
+        const trackData = await fetchTrack(trackId);
+
+        if (!trackData) {
+            res.status(404).json({ message: "Track not found" });
+            return;
+        }
+
+        res.status(200).json(trackData);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Erreur lors de la récupération des données du morceau" });
     }
 }
