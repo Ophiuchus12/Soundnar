@@ -2,9 +2,13 @@ import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation
 
 const url = "http://localhost:3000"
 
-export async function createPlaylist(title: string, authorId: string): Promise<responsePlaylistCreation | null> {
+export async function createPlaylist(
+    title: string,
+    authorId: string
+): Promise<responsePlaylistCreation | { error: string }> {
     const URL = `${url}/api/playlist/create`;
     const body = { title, authorId };
+
     try {
         const response = await fetch(URL, {
             method: "POST",
@@ -12,12 +16,19 @@ export async function createPlaylist(title: string, authorId: string): Promise<r
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(body),
-        })
-        if (!response.ok) throw new Error("Erreur lors de la création de la playliste");
-        return await response.json() as responsePlaylistCreation;
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            return { error: errorData.message };
+        }
+
+        const data = await response.json();
+        return data as responsePlaylistCreation;
     } catch (error) {
-        console.error("Erreur dans la création d'une playlist", error);
-        return null;
+        console.error("Erreur dans la création d'une playlist :", error);
+
+        return { error: "Erreur réseau ou interne lors de la création de la playlist." };
     }
 }
 

@@ -18,7 +18,7 @@ export default function Sidebar() {
 
 
     return (
-        <div className="w-64 h-full bg-transparent p-2 fixed left-0 top-0 z-100 rounded-tr-3xl mr-4 border-purple-500/50 mt-">
+        <div className="w-64 h-full bg-gradient-to-r from-purple-600 to-blue-500 p-2 fixed left-0 top-0 z-100 rounded-tr-3xl mr-4 border-purple-500/50 mt-">
             <div className="flex justify-center mb-2">
                 <img
                     className="w-45 h-25 rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]"
