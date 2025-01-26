@@ -1,10 +1,10 @@
-import { ActionFunction, LoaderFunction, redirect } from '@remix-run/node';
-import { Form, useActionData, useLoaderData } from '@remix-run/react';
+import { ActionFunction, json, LoaderFunction, redirect } from '@remix-run/node';
+import { Form, useActionData, useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
 import { createPlaylist, getAllPlaylists } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
-import { playlistAllResponse, PlaylistPerso } from '~/types';
+import { PlaylistPerso } from '~/types';
 
 function formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
@@ -66,12 +66,15 @@ export const action: ActionFunction = async ({ request }) => {
 
         const playlistCreation = await createPlaylist(playlistTitle, userId)
 
-        if (!playlistCreation) {
-            errors.title = "An error occurred while creating the playlist";
-            return { errors };
+        if ("error" in playlistCreation) {
+            console.error("Erreur lors de la création de la playlist :", playlistCreation.error);
+            return { errors: { title: playlistCreation.error } }; // Retournez l'erreur
         } else {
-            return redirect("/playlists");
+            const playlistId = playlistCreation.playlist.idPlaylist;
+            return redirect(`/playlistDetails/${playlistId}`);
         }
+
+
     } catch (error) {
         console.error(error);
 
@@ -101,16 +104,19 @@ export default function Playlists() {
         title?: string;
     }>({});
     const actionData = useActionData<typeof action>();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (actionData?.errors) {
             setErrors(actionData.errors);
-        } else {
-            setErrors({});
         }
     }, [actionData]);
 
     const toggleForm = () => setIsFormVisible(!isFormVisible);
+
+    const handleClickPlaylist = (id: string) => {
+        navigate((`/playlistDetails/${id}`))
+    }
 
 
     return (
@@ -119,26 +125,32 @@ export default function Playlists() {
                 <div>
                     <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
                     <p className="text-lg mt-2">Your Playlists</p>
-                    <div className="mt-4">
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {playlists.length > 0 ? (
                             playlists.map((playlist) => (
                                 <div
                                     key={playlist.idPlaylist}
-                                    className="my-2 bg-gray-800 p-4 rounded-lg shadow"
+                                    className="group relative bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer"
+                                    onClick={() => handleClickPlaylist(playlist.idPlaylist)}
                                 >
-                                    <h2 className="text-xl font-semibold">{playlist.title}</h2>
-                                    <p className="text-sm text-gray-400">
-                                        {playlist.nbTracks} tracks
+                                    <h2 className="text-2xl font-semibold text-white group-hover:text-[#7600be] transition-colors duration-300">
+                                        {playlist.title}
+                                    </h2>
+                                    <p className="mt-2 text-sm text-gray-400">
+                                        <span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}
                                     </p>
-                                    <p className="text-sm text-gray-400">
-                                        {formatTime(playlist.tempsPlaylist)} minutes
+                                    <p className="mt-1 text-sm text-gray-400">
+                                        <span className="font-bold text-white">Duration:</span> {formatTime(playlist.tempsPlaylist)}
                                     </p>
                                 </div>
                             ))
                         ) : (
-                            <p className="text-gray-400">You don't have any playlists yet.</p>
+                            <p className="text-gray-400 text-center col-span-full">
+                                You don't have any playlists yet.
+                            </p>
                         )}
                     </div>
+
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={toggleForm}

@@ -28,7 +28,7 @@ export async function playlistCreation(req: Request, res: Response): Promise<voi
         });
 
         if (existing) {
-            res.status(409).json({ message: "Playlist déjà existante." });
+            res.status(400).json({ message: "Playlist déjà existante." });
             return;
         }
 
@@ -36,9 +36,11 @@ export async function playlistCreation(req: Request, res: Response): Promise<voi
             data: { title: normalizedTitle, authorId },
         });
 
+
+
         res.status(201).json({ message: "Playlist créée avec succès.", playlist });
     } catch (err) {
-        console.error(err); // Utile pour le debug en local
+        console.error(err);
         res.status(500).json({ message: "Une erreur interne est survenue." });
     }
 }
