@@ -1,6 +1,7 @@
 import { ActionFunction, json, LoaderFunction, redirect } from '@remix-run/node';
 import { Form, useActionData, useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
+import AddMenu from '~/components/addMenu';
 import { createPlaylist, formatTime, getAllPlaylists } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
@@ -95,7 +96,8 @@ export default function Playlists() {
     }>();
 
     const [isFormVisible, setIsFormVisible] = useState(false);
-    const [playlistTitle, setplaylistTitle] = useState("");
+    const [isAddMenuVisible, setIsAddMenuVisible] = useState(false); // État pour afficher la modale AddMenu
+    const [playlistTitle, setPlaylistTitle] = useState("");
     const [errors, setErrors] = useState<{
         title?: string;
     }>({});
@@ -110,10 +112,11 @@ export default function Playlists() {
 
     const toggleForm = () => setIsFormVisible(!isFormVisible);
 
-    const handleClickPlaylist = (id: string) => {
-        navigate((`/playlistDetails/${id}`))
-    }
+    const toggleAddMenu = () => setIsAddMenuVisible(!isAddMenuVisible); // Toggle pour AddMenu
 
+    const handleClickPlaylist = (id: string) => {
+        navigate(`/playlistDetails/${id}`);
+    };
 
     return (
         <div className="min-h-screen text-white flex items-center justify-center">
@@ -137,7 +140,8 @@ export default function Playlists() {
                                         <span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}
                                     </p>
                                     <p className="mt-1 text-sm text-gray-400">
-                                        <span className="font-bold text-white">Duration:</span> {formatTime(playlist.duration)}
+                                        <span className="font-bold text-white">Duration:</span>{" "}
+                                        {formatTime(playlist.duration)}
                                     </p>
                                 </div>
                             ))
@@ -156,6 +160,14 @@ export default function Playlists() {
                             Add a Playlist
                         </button>
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={toggleAddMenu} // Affiche la modale AddMenu
+                        className="bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                    >
+                        AddTrack
+                    </button>
                 </div>
             ) : (
                 <div className="max-w-md text-center bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -181,7 +193,7 @@ export default function Playlists() {
                 </div>
             )}
 
-            {/* Modal */}
+            {/* Modal Add Playlist */}
             {isFormVisible && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">
                     <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md transform transition-transform duration-300 ease-in-out scale-95 hover:scale-100">
@@ -196,7 +208,7 @@ export default function Playlists() {
                                     id="title"
                                     name="title"
                                     value={playlistTitle}
-                                    onChange={(e) => setplaylistTitle(e.target.value)}
+                                    onChange={(e) => setPlaylistTitle(e.target.value)}
                                     className="mt-2 p-3 w-full bg-gray-700 rounded-lg border border-gray-600 focus:ring-2 focus:ring-[#7600be] focus:outline-none"
                                 />
                                 {errors.title && (
@@ -205,7 +217,6 @@ export default function Playlists() {
                             </div>
 
                             <div className="flex justify-between items-center mt-6">
-
                                 <button
                                     type="submit"
                                     className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
@@ -228,6 +239,10 @@ export default function Playlists() {
                 </div>
             )}
 
+            {/* Modal AddTrack */}
+            {isAddMenuVisible && (
+                <AddMenu idTrackDeezer={558654} playlists={playlists} />
+            )}
         </div>
     );
 }
