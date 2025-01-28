@@ -159,8 +159,8 @@ export default function PlaylistDetails() {
                       <button
                         onClick={() => handlePlayClick(track.id)}
                         className={`rounded-full p-3 transition-all shadow-md ${playingTrackId === track.id
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-700 text-gray-400 hover:bg-purple-800 hover:text-white"
+                          ? "bg-purple-600 text-white"
+                          : "bg-gray-700 text-gray-400 hover:bg-purple-800 hover:text-white"
                           }`}
                         aria-label={playingTrackId === track.id ? "Stop" : "Play"}
                       >
@@ -209,8 +209,9 @@ export default function PlaylistDetails() {
             </div>
           </div>
         </div>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }
 
