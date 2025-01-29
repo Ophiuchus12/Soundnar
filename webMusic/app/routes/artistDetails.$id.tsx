@@ -3,11 +3,19 @@ import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
 import { FaArrowLeft } from 'react-icons/fa';
 import { GiMusicSpell } from 'react-icons/gi';
+import { PiMusicNotesPlus } from 'react-icons/pi';
+import AddMenu from '~/components/addMenu';
 import { getArtist, getArtistAlbums, getArtistTopSong } from '~/lib/Music';
-import { ArtistDetail, ArtistDetailAlbumList, ArtistTopSongList } from '~/types';
+import { getAllPlaylists } from '~/lib/Playlist';
+import { getMe, verify } from '~/lib/User';
+import { getSession } from '~/session.server';
+import { ArtistDetail, ArtistDetailAlbumList, ArtistTopSongList, PlaylistPerso } from '~/types';
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
     const { id } = params;
+    const session = await getSession(request.headers.get("Cookie"));
+    const token = session.get("authToken");
+    let userId: string = "";
 
     if (!id) {
         throw new Error('Missing artist ID');
@@ -30,15 +38,50 @@ export async function loader({ params }: LoaderFunctionArgs) {
         console.error('Failed to fetch top artist song');
         return null;
     }
-    return { artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong }
+
+    if (!token) {
+        return { isAuthenticated: false, artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong };
+    } else {
+        const response = await getMe(token);
+        if (response && response.user) {
+            userId = response.user.id.toString();
+        }
+    }
+
+    const isValid = await verify(token);
+    if (!isValid) {
+        return { isAuthenticated: false, error: null, token: null, artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong };
+    }
+    //console.log("user", userId);
+    const playlists = await getAllPlaylists(userId);
+
+
+
+    return { artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong, isAuthenticated: true, error: null, token: token, playlists: playlists }
 
 }
 
 
 export default function ArtistDetails() {
 
-    const { artistData, artistDataAlbums, topArtistDataSong } = useLoaderData<{ artistData: ArtistDetail, artistDataAlbums: ArtistDetailAlbumList, topArtistDataSong: ArtistTopSongList }>();
+    const { artistData, artistDataAlbums, topArtistDataSong, isAuthenticated, token, error, playlists } = useLoaderData<{
+        artistData: ArtistDetail;
+        artistDataAlbums: ArtistDetailAlbumList;
+        topArtistDataSong: ArtistTopSongList;
+        isAuthenticated: boolean;
+        token: string | null;
+        playlists: PlaylistPerso[];
+        error: string | null;
+    }>();
     const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
+
+    const [addMenuTrackId, setAddMenuTrackId] = useState<number | null>(null);
+
+
+    const toggleAddMenu = (trackId: number) => {
+        //console.log("trackId", trackId);
+        setAddMenuTrackId(addMenuTrackId === trackId ? null : trackId);
+    };
     const navigate = useNavigate();
 
     const handleClickAlbum = (idAlbum: number) => {
@@ -113,16 +156,36 @@ export default function ArtistDetails() {
                                     <h2 className="text-gray-400 text-sm">{formatDuration(track.duration)}</h2>
                                 </div>
 
-                                <button
-                                    onClick={() => handlePlayClick(track.id)}
-                                    className={`rounded-full p-2 transition-all ${playingTrackId === track.id
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
-                                        }`}
-                                    aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
-                                >
-                                    <GiMusicSpell className="h-5 w-5" />
-                                </button>
+                                <div className="flex items-center justify-end gap-4">
+                                    {/* Bouton Lecture */}
+                                    <button
+                                        onClick={() => handlePlayClick(track.id)}
+                                        className={`rounded-full p-2 transition-all ${playingTrackId === track.id
+                                            ? 'bg-purple-600 text-white'
+                                            : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
+                                            }`}
+                                        aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
+                                    >
+                                        <GiMusicSpell className="w-6 h-6 text-white" />
+                                    </button>
+
+                                    {/* Bouton Ajout Playlist */}
+                                    {isAuthenticated && (
+                                        <button
+                                            onClick={() => toggleAddMenu(track.id)}
+                                            className="p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md active:scale-90"
+                                            aria-label="Add to playlist"
+                                        >
+                                            <PiMusicNotesPlus className="h-5 w-5 text-white" />
+                                        </button>
+                                    )}
+
+                                </div>
+
+                                {/* Affichage conditionnel du menu d'ajout */}
+                                {addMenuTrackId === track.id && (
+                                    <AddMenu idTrackDeezer={track.id} playlists={playlists} onClose={() => setAddMenuTrackId(null)} />
+                                )}
 
                                 {/* Rendre conditionnellement le lecteur audio pour le morceau sélectionné */}
                                 {playingTrackId === track.id && (
