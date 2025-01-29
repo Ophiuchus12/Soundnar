@@ -1,13 +1,16 @@
 import "../styles/index.css";
 import { getChartAlbums, getChartArtists, getChartTracks, getGenre, searchArtist, searchGlobal } from "../lib/Music";
 import { Form, useLoaderData, useNavigate } from "@remix-run/react";
-import { Album, Artist, Genre, Track } from "../types";
+import { Album, Artist, Genre, PlaylistPerso, Track } from "../types";
 import { useEffect, useState } from "react";
 import { GiMusicSpell } from "react-icons/gi";
 import GenreCarousel from "~/components/GenreCarousel";
 import { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { commitSession, getSession } from "~/session.server";
 import { getMe, verify } from "~/lib/User";
+import { PiMusicNotesPlus } from "react-icons/pi";
+import AddMenu from "~/components/addMenu";
+import { getAllPlaylists } from "~/lib/Playlist";
 
 export const loader: LoaderFunction = async ({ request }) => {
   // Handle session and authentication
@@ -22,7 +25,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   }
 
   let isAuthenticated = undefined;
-  let userName = null;
+  let userName: string = "";
+  let userId: string = "";
   if (token) {
     isAuthenticated = await verify(token);
     console.log(isAuthenticated)
@@ -31,8 +35,10 @@ export const loader: LoaderFunction = async ({ request }) => {
     //console.log(response);
     if (response?.user) {
       userName = response.user.username;
+      userId = response.user.id.toString();
     }
   }
+  const playlists = await getAllPlaylists(userId);
 
   //console.log("nom", userName);
 
@@ -56,6 +62,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         token,
         error,
         userName,
+        playlists,
         albums: chartAlbum.data,
         artists: chartArtist.data,
         tracks: chartTrack.data,
@@ -76,6 +83,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         isAuthenticated,
         token,
         userName,
+        playlists,
         error: error,
         albums: [],
         artists: [],
@@ -115,12 +123,13 @@ export const action: ActionFunction = async ({ request }) => {
 
 
 export default function Index() {
-  const { albums, artists, tracks, genres, isAuthenticated, token, userName, error } = useLoaderData<{
+  const { albums, artists, tracks, genres, isAuthenticated, token, userName, error, playlists } = useLoaderData<{
     albums: Album[];
     artists: Artist[];
     tracks: Track[];
     genres: Genre[];
     isAuthenticated: boolean;
+    playlists: PlaylistPerso[];
     token: string | null;
     userName: string | null;
     error: string | null;
@@ -133,6 +142,14 @@ export default function Index() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
   const navigate = useNavigate();
+
+  const [addMenuTrackId, setAddMenuTrackId] = useState<number | null>(null);
+
+
+  const toggleAddMenu = (trackId: number) => {
+    //console.log("trackId", trackId);
+    setAddMenuTrackId(addMenuTrackId === trackId ? null : trackId);
+  };
 
   const handlePlayClick = (trackId: number) => {
     setPlayingTrackId(playingTrackId === trackId ? null : trackId);
@@ -247,18 +264,36 @@ export default function Index() {
                         <h3 className="text-white text-base font-medium">{track.title}</h3>
                         <p className="text-gray-400 text-sm">by {track.artist.name}</p>
                       </div>
-                      <div className="flex items-center justify-between space-x-4">
+                      <div className="flex items-center justify-end gap-4">
+                        {/* Bouton Lecture */}
                         <button
                           onClick={() => handlePlayClick(track.id)}
                           className={`rounded-full p-2 transition-all ${playingTrackId === track.id
-                            ? "bg-purple-600 text-white"
-                            : "bg-gray-800 text-2xl text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
                             }`}
-                          aria-label={playingTrackId === track.id ? "Stop" : "Play"}
+                          aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
                         >
-                          <GiMusicSpell />
+                          <GiMusicSpell className="w-6 h-6 text-white" />
                         </button>
+
+                        {/* Bouton Ajout Playlist */}
+                        {isAuthenticated && (
+                          <button
+                            onClick={() => toggleAddMenu(track.id)}
+                            className="p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md active:scale-90"
+                            aria-label="Add to playlist"
+                          >
+                            <PiMusicNotesPlus className="h-5 w-5 text-white" />
+                          </button>
+                        )}
+
                       </div>
+
+                      {/* Affichage conditionnel du menu d'ajout */}
+                      {addMenuTrackId === track.id && (
+                        <AddMenu idTrackDeezer={track.id} playlists={playlists} onClose={() => setAddMenuTrackId(null)} />
+                      )}
 
                       {playingTrackId === track.id && (
                         <audio className="hidden" controls autoPlay>
