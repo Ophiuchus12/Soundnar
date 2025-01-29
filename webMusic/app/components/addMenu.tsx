@@ -6,9 +6,10 @@ import { addTrack } from "~/lib/Playlist";
 interface AddMenuProps {
     playlists: PlaylistPerso[];
     idTrackDeezer: number;
+    onClose: () => void;
 }
 
-const AddMenu: React.FC<AddMenuProps> = ({ playlists, idTrackDeezer }) => {
+const AddMenu: React.FC<AddMenuProps> = ({ playlists, idTrackDeezer, onClose }) => {
     const [showModal, setShowModal] = useState(true);
 
     const [selectedPlaylist, setSelectedPlaylist] = useState("");
@@ -29,6 +30,8 @@ const AddMenu: React.FC<AddMenuProps> = ({ playlists, idTrackDeezer }) => {
         }
 
         try {
+
+            //console.log("plazylistId", selectedPlaylist, "IdTrackDeezer", idTrackDeezer)
             const response = await addTrack(selectedPlaylist, idTrackDeezer);
 
             if (!response) {
@@ -37,6 +40,7 @@ const AddMenu: React.FC<AddMenuProps> = ({ playlists, idTrackDeezer }) => {
 
             console.log("Track added successfully:", response?.message);
             closeModal();
+            onClose();
         } catch (err) {
             setError(error || "An error occurred");
         }

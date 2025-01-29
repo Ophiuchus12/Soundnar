@@ -96,7 +96,6 @@ export default function Playlists() {
     }>();
 
     const [isFormVisible, setIsFormVisible] = useState(false);
-    const [isAddMenuVisible, setIsAddMenuVisible] = useState(false); // État pour afficher la modale AddMenu
     const [playlistTitle, setPlaylistTitle] = useState("");
     const [errors, setErrors] = useState<{
         title?: string;
@@ -111,8 +110,6 @@ export default function Playlists() {
     }, [actionData]);
 
     const toggleForm = () => setIsFormVisible(!isFormVisible);
-
-    const toggleAddMenu = () => setIsAddMenuVisible(!isAddMenuVisible); // Toggle pour AddMenu
 
     const handleClickPlaylist = (id: string) => {
         navigate(`/playlistDetails/${id}`);
@@ -160,14 +157,6 @@ export default function Playlists() {
                             Add a Playlist
                         </button>
                     </div>
-
-                    <button
-                        type="button"
-                        onClick={toggleAddMenu} // Affiche la modale AddMenu
-                        className="bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
-                    >
-                        AddTrack
-                    </button>
                 </div>
             ) : (
                 <div className="max-w-md text-center bg-gray-800 p-6 rounded-lg shadow-lg">
@@ -237,11 +226,6 @@ export default function Playlists() {
                         </Form>
                     </div>
                 </div>
-            )}
-
-            {/* Modal AddTrack */}
-            {isAddMenuVisible && (
-                <AddMenu idTrackDeezer={558654} playlists={playlists} />
             )}
         </div>
     );
