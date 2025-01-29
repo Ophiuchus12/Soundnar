@@ -28,7 +28,7 @@ export async function playlistCreation(req: Request, res: Response): Promise<voi
         });
 
         if (existing) {
-            res.status(409).json({ message: "Playlist déjà existante." });
+            res.status(400).json({ message: "Playlist déjà existante." });
             return;
         }
 
@@ -36,9 +36,11 @@ export async function playlistCreation(req: Request, res: Response): Promise<voi
             data: { title: normalizedTitle, authorId },
         });
 
+
+
         res.status(201).json({ message: "Playlist créée avec succès.", playlist });
     } catch (err) {
-        console.error(err); // Utile pour le debug en local
+        console.error(err);
         res.status(500).json({ message: "Une erreur interne est survenue." });
     }
 }
@@ -132,7 +134,7 @@ export async function addTrack(req: Request, res: Response): Promise<void> {
                     },
                 },
                 nbTracks: playlist.nbTracks + 1,
-                tempsPlaylist: playlist.tempsPlaylist + track.duration,
+                duration: playlist.duration + track.duration,
             },
         });
 
@@ -186,7 +188,7 @@ export async function deleteTrackPlaylist(req: Request, res: Response): Promise<
                     disconnect: { idTrack: track.idTrack },
                 },
                 nbTracks: playlist.nbTracks - 1, // Décrémenter le nombre de chansons
-                tempsPlaylist: playlist.tempsPlaylist - track.duration, // Réduire le temps total de la playlist
+                duration: playlist.duration - track.duration, // Réduire le temps total de la playlist
             },
         });
 
@@ -251,5 +253,51 @@ export async function updatePlaylist(req: Request, res: Response): Promise<void>
     } catch (error) {
         console.error("Erreur dans l'update de la playlist", error);
         res.status(500).json({ message: "Erreur serveur lors de la mise à jour de la playlist." });
+    }
+}
+
+
+export async function getAllPlaylists(req: Request, res: Response): Promise<void> {
+    const { userId } = req.body;
+
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
+    try {
+        const playlists = await prisma.playlist.findMany({
+            where: { authorId: userId }, // Utiliser le champ correct du modèle
+            include: { songs: true }, // Inclure les chansons associées à la playlist
+        });
+
+        res.status(200).json(playlists);
+    } catch (error) {
+        console.error("Erreur dans getAllPlaylists:", error);
+        res.status(500).json({ message: "Erreur serveur lors de la récupération de toutes les playlists." });
+    }
+}
+
+
+
+export async function getPlaylistById(req: Request, res: Response): Promise<void> {
+    const { idPlaylist } = req.params;
+    if (!idPlaylist || typeof idPlaylist !== "string") {
+        res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
+        return;
+    }
+    try {
+        const playlist = await prisma.playlist.findUnique({
+            where: { idPlaylist },
+            include: { songs: true }, // Inclure les chansons associées à la playlist
+        })
+        if (!playlist) {
+            res.status(404).json({ message: "La playlist n'a pas été trouvée." });
+            return;
+        }
+        res.status(200).json(playlist);
+    } catch (error) {
+        console.error("Erreur dans getPlaylistId", error);
+        res.status(500).json({ message: "Erreur serveur lors de la récupération de la playlist." });
     }
 }

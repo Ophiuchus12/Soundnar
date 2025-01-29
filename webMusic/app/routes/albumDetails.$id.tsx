@@ -1,14 +1,22 @@
-import { LoaderFunction, LoaderFunctionArgs } from '@remix-run/node'
+import { LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
 import { getAlbum } from '~/lib/Music';
-import { AlbumDetail, Track } from '../types';
-import { FaArrowLeft, FaRegPlayCircle } from 'react-icons/fa';
+import { AlbumDetail, PlaylistPerso } from '../types';
+import { FaArrowLeft } from 'react-icons/fa';
 import { GiMusicSpell } from "react-icons/gi";
+import { PiMusicNotesPlus } from "react-icons/pi";
 import "../styles/index.css";
+import AddMenu from '~/components/addMenu';
+import { getSession } from '~/session.server';
+import { getMe, verify } from '~/lib/User';
+import { getAllPlaylists } from '~/lib/Playlist';
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ params, request }: LoaderFunctionArgs) {
     const { id } = params;
+    const session = await getSession(request.headers.get("Cookie"));
+    const token = session.get("authToken");
+    let userId: string = "";
 
     if (!id) {
         throw new Error('Missing artist ID');
@@ -17,18 +25,39 @@ export async function loader({ params }: LoaderFunctionArgs) {
     const albumData = await getAlbum(Number(id));
     if (!albumData) {
         console.error('Failed to fetch artist');
-        return null;
     }
 
+    if (!token) {
+        return { isAuthenticated: false, albumData: albumData };
+    } else {
+        const response = await getMe(token);
+        if (response && response.user) {
+            userId = response.user.id.toString();
+        }
+    }
 
-    return { albumData: albumData }
+    const isValid = await verify(token);
+    if (!isValid) {
+        return { isAuthenticated: false, error: null, token: null };
+    }
+    //console.log("user", userId);
+    const playlists = await getAllPlaylists(userId);
+
+
+    return { isAuthenticated: true, error: null, token: token, albumData: albumData, playlists: playlists }
 
 }
 
 
 export default function AlbumDetails() {
 
-    const { albumData } = useLoaderData<{ albumData: AlbumDetail }>();
+    const { isAuthenticated, error, token, albumData, playlists } = useLoaderData<{
+        albumData: AlbumDetail;
+        isAuthenticated: boolean;
+        token: string | null;
+        playlists: PlaylistPerso[];
+        error: string | null;
+    }>();
 
 
     const [modal, setModal] = useState(false);
@@ -50,6 +79,13 @@ export default function AlbumDetails() {
     const handleArtist = (artistId: number) => {
         navigate(`/artistDetails/${artistId}`)
     }
+
+    const [addMenuTrackId, setAddMenuTrackId] = useState<number | null>(null);
+
+    const toggleAddMenu = (trackId: number) => {
+        //console.log("trackId", trackId);
+        setAddMenuTrackId(addMenuTrackId === trackId ? null : trackId);
+    };
 
 
     return (
@@ -118,6 +154,7 @@ export default function AlbumDetails() {
                 </button>
 
             </div>
+
             {/* Affichage de l'album et de l'artiste */}
             <div className="relative px-6 pt-10">
                 <div className="mx-auto max-w-6xl">
@@ -155,29 +192,47 @@ export default function AlbumDetails() {
                 <div className="overflow-y-auto" style={{ maxHeight: '400px' }}>
                     {albumData?.tracks.data.map((track) => (
                         <div key={track.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-4 hover:bg-gray-600">
+                            {/* Titre et durée */}
                             <div className="flex flex-col">
                                 <h1 className="text-white text-lg">{track?.title}</h1>
                                 <h2 className="text-gray-400 text-sm">{formatDuration(track.duration)}</h2>
                             </div>
 
-                            <button
-                                onClick={() => handlePlayClick(track.id)}
-                                className={`rounded-full p-2 transition-all ${playingTrackId === track.id
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
-                                    }`}
-                                aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
-                            >
-                                <GiMusicSpell className="h-5 w-5" />
-                            </button>
-
-                            {/* Rendre conditionnellement le lecteur audio pour le morceau sélectionné */}
-                            {playingTrackId === track.id && (
-                                <audio
-                                    className="hidden"
-                                    controls
-                                    autoPlay
+                            {/* Icônes alignées à droite */}
+                            <div className="flex items-center justify-end gap-4">
+                                {/* Bouton Lecture */}
+                                <button
+                                    onClick={() => handlePlayClick(track.id)}
+                                    className={`rounded-full p-2 transition-all ${playingTrackId === track.id
+                                        ? 'bg-purple-600 text-white'
+                                        : 'bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white'
+                                        }`}
+                                    aria-label={playingTrackId === track.id ? 'Stop' : 'Play'}
                                 >
+                                    <GiMusicSpell className="w-6 h-6 text-white" />
+                                </button>
+
+                                {/* Bouton Ajout Playlist */}
+                                {isAuthenticated && (
+                                    <button
+                                        onClick={() => toggleAddMenu(track.id)}
+                                        className="p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md active:scale-90"
+                                        aria-label="Add to playlist"
+                                    >
+                                        <PiMusicNotesPlus className="h-5 w-5 text-white" />
+                                    </button>
+                                )}
+
+                            </div>
+
+                            {/* Affichage conditionnel du menu d'ajout */}
+                            {addMenuTrackId === track.id && (
+                                <AddMenu idTrackDeezer={track.id} playlists={playlists} onClose={() => setAddMenuTrackId(null)} />
+                            )}
+
+                            {/* Affichage conditionnel du lecteur audio */}
+                            {playingTrackId === track.id && (
+                                <audio className="hidden" controls autoPlay>
                                     <source src={track.preview} type="audio/mpeg" />
                                     Votre navigateur ne supporte pas l'élément audio.
                                 </audio>
