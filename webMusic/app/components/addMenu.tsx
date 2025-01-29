@@ -96,7 +96,7 @@ const AddMenu: React.FC<AddMenuProps> = ({ playlists, idTrackDeezer, onClose }) 
                         </form>
 
                         <button
-                            onClick={closeModal}
+                            onClick={() => { closeModal; onClose() }}
                             className="mt-4 text-sm text-gray-400 hover:text-white underline"
                         >
                             Cancel
