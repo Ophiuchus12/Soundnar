@@ -110,7 +110,7 @@ export async function updatePlaylist(idPlaylist: string, title: string): Promise
 export async function getAllPlaylists(userId: string): Promise<playlistAllResponse | null> {
     const URL = `${url}/api/playlist/allPlaylists`;
     const body = { userId };
-    //console.log("json log ", JSON.stringify(body));
+    console.log("json log ", JSON.stringify(body));
     try {
         const response = await fetch(URL, {
             method: "POST",

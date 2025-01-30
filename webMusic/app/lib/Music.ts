@@ -279,7 +279,7 @@ export async function searchArtist(content: string): Promise<ArtistSearchData | 
 }
 
 
-export async function getTrackById(idTrack: number): Promise<getOneTrackData | null> {
+export async function getTrackById(idTrack: string): Promise<getOneTrackData | null> {
     const URL = `${url}/api/music/track/${idTrack}`;
 
     try {

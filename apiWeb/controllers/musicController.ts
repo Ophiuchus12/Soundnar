@@ -204,7 +204,7 @@ export async function getSearchGlobal(req: Request, res: Response): Promise<void
 
 export async function getTrackById(req: Request, res: Response): Promise<void> {
     try {
-        const trackId = parseInt(req.params.idTrack);
+        const trackId = req.params.idTrack;
         const trackData = await fetchTrack(trackId);
 
         if (!trackData) {

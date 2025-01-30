@@ -55,7 +55,7 @@ export async function addTrack(req: Request, res: Response): Promise<void> {
         return;
     }
 
-    if (!idTrack || typeof idTrack !== "number") {
+    if (!idTrack || typeof idTrack !== "string") {
         res.status(400).json({ message: "L'identifiant de la piste est invalide." });
         return;
     }

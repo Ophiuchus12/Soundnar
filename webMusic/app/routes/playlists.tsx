@@ -1,8 +1,8 @@
 import { ActionFunction, json, LoaderFunction, redirect } from '@remix-run/node';
 import { Form, useActionData, useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
-import AddMenu from '~/components/addMenu';
-import { createPlaylist, formatTime, getAllPlaylists } from '~/lib/Playlist';
+import { createPlaylist, deletePlaylist, formatTime, getAllPlaylists } from '~/lib/Playlist';
+import { FaTrash } from "react-icons/fa";
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
 import { PlaylistPerso } from '~/types';
@@ -33,6 +33,7 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
     //console.log("user", userId);
     const playlists = await getAllPlaylists(userId);
+    //console.log("playlists", playlists);
 
 
     return { isAuthenticated: true, error: null, token: token, userId: userId, userName: userName, playlists: playlists };
@@ -115,31 +116,60 @@ export default function Playlists() {
         navigate(`/playlistDetails/${id}`);
     };
 
+    const handleDeletePlaylist = async (id: string) => {
+        if (id !== undefined) {
+            try {
+                const handleDelete = await deletePlaylist(id);
+                if (handleDelete) {
+                    navigate('/playlists')
+                }
+            } catch (err) {
+                console.error("Erreur lors de la suppression de la playlist :", err);
+            }
+        }
+    };
+
     return (
         <div className="min-h-screen text-white flex items-center justify-center">
             {isAuthenticated ? (
                 <div>
                     <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
                     <p className="text-lg mt-2">Your Playlists</p>
-                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ">
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {playlists.length > 0 ? (
                             playlists.map((playlist) => (
                                 <div
                                     key={playlist.idPlaylist}
-                                    className="group relative bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform 
-                                    transition-transform duration-300 ease-in-out scale-100 hover:scale-110"
+                                    className="group relative bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer 
+                                    transform transition-transform duration-300 ease-in-out scale-100 hover:scale-105"
                                     onClick={() => handleClickPlaylist(playlist.idPlaylist)}
                                 >
+                                    {/* Playlist Title */}
                                     <h2 className="text-2xl font-semibold text-white group-hover:text-[#7600be] transition-colors duration-300">
                                         {playlist.title}
                                     </h2>
-                                    <p className="mt-2 text-sm text-gray-400">
-                                        <span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}
-                                    </p>
-                                    <p className="mt-1 text-sm text-gray-400">
-                                        <span className="font-bold text-white">Duration:</span>{" "}
-                                        {formatTime(playlist.duration)}
-                                    </p>
+
+                                    {/* Playlist Info */}
+                                    <div className="mt-2">
+                                        <p className="text-sm text-gray-400">
+                                            <span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}
+                                        </p>
+                                        <p className="mt-1 text-sm text-gray-400">
+                                            <span className="font-bold text-white">Duration:</span> {formatTime(playlist.duration)}
+                                        </p>
+                                    </div>
+
+                                    {/* Delete Icon with Hover Effect */}
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent triggering the playlist click
+                                            handleDeletePlaylist(playlist.idPlaylist);
+                                        }}
+                                        className="absolute bottom-3 right-3 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-200"
+                                        aria-label="Delete Playlist"
+                                    >
+                                        <FaTrash />
+                                    </button>
                                 </div>
                             ))
                         ) : (
@@ -149,6 +179,7 @@ export default function Playlists() {
                         )}
                     </div>
 
+                    {/* Add Playlist Button */}
                     <div className="mt-6 flex justify-center">
                         <button
                             onClick={toggleForm}
