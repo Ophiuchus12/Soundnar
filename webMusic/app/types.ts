@@ -445,7 +445,7 @@ export interface PlaylistPerso {
 
 export interface TrackPerso {
     idTrack: string;
-    idTrackDeezer: number;
+    idTrackDeezer: string;
     title: string;
     duration: number;
     preview: string;

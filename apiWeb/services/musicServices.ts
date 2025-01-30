@@ -177,7 +177,7 @@ export async function fetchSearchArtist(searchData: string): Promise<ArtistSearc
 }
 
 
-export async function fetchTrack(idTrack: number): Promise<getOneTrackData | null> {
+export async function fetchTrack(idTrack: string): Promise<getOneTrackData | null> {
     try {
         const url = `https://api.deezer.com/track/${idTrack}`;
         const response = await axios.get<getOneTrackData>(url);
