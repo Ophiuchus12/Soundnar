@@ -48,7 +48,7 @@ export async function playlistCreation(req: Request, res: Response): Promise<voi
 
 export async function addTrack(req: Request, res: Response): Promise<void> {
     const { idPlaylist, idTrack } = req.body;
-
+    //console.log("gggg", typeof idPlaylist, typeof idTrack);
     // Validation des paramètres
     if (!idPlaylist || typeof idPlaylist !== "string") {
         res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
@@ -60,9 +60,15 @@ export async function addTrack(req: Request, res: Response): Promise<void> {
         return;
     }
 
+
+    //console.log("BEFOREtestpage");
     try {
+
+        //console.log("testpage");
         // Récupération des détails de la piste depuis l'API Deezer
         const responseTrack = await fetchTrack(idTrack);
+
+        //console.log("RESS", responseTrack);
 
         if (!responseTrack) {
             res.status(404).json({ message: "La piste n'a pas été trouvée sur Deezer." });
@@ -148,7 +154,7 @@ export async function addTrack(req: Request, res: Response): Promise<void> {
 
 export async function deleteTrackPlaylist(req: Request, res: Response): Promise<void> {
     const { idPlaylist, idTrack } = req.body;
-
+    console.log("gggg", idPlaylist, typeof idTrack);
     // Validation des paramètres
     if (!idPlaylist || typeof idPlaylist !== "string") {
         res.status(400).json({ message: "L'identifiant de la playlist est invalide." });
@@ -167,13 +173,17 @@ export async function deleteTrackPlaylist(req: Request, res: Response): Promise<
             include: { songs: true }, // Inclure les chansons associées à la playlist
         });
 
+        //console.log("playlistdelete", playlist);
+
         if (!playlist) {
             res.status(404).json({ message: "La playlist n'a pas été trouvée." });
             return;
         }
 
         // Vérifier si la chanson est présente dans la playlist
-        const track = playlist.songs.find((song) => song.idTrack === idTrack);
+        const track = playlist.songs.find((song) => song.idTrackDeezer === idTrack);
+
+        console.log("track", track);
 
         if (!track) {
             res.status(404).json({ message: "La chanson n'est pas présente dans la playlist." });
