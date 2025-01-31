@@ -61,7 +61,7 @@ export default function AlbumDetails() {
 
 
     const [modal, setModal] = useState(false);
-    const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
+    const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
     const navigate = useNavigate();
 
     function formatDuration(seconds: number): string {
@@ -71,7 +71,7 @@ export default function AlbumDetails() {
     }
 
 
-    const handlePlayClick = (trackId: number) => {
+    const handlePlayClick = (trackId: string) => {
         // Si le morceau cliqué est déjà en lecture, on l'arrête
         setPlayingTrackId(playingTrackId === trackId ? null : trackId);
     };
@@ -80,10 +80,10 @@ export default function AlbumDetails() {
         navigate(`/artistDetails/${artistId}`)
     }
 
-    const [addMenuTrackId, setAddMenuTrackId] = useState<number | null>(null);
+    const [addMenuTrackId, setAddMenuTrackId] = useState<string | null>(null);
 
-    const toggleAddMenu = (trackId: number) => {
-        //console.log("trackId", trackId);
+    const toggleAddMenu = (trackId: string) => {
+        console.log("trackIdddd", typeof trackId);
         setAddMenuTrackId(addMenuTrackId === trackId ? null : trackId);
     };
 

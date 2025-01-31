@@ -73,12 +73,12 @@ export default function ArtistDetails() {
         playlists: PlaylistPerso[];
         error: string | null;
     }>();
-    const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
+    const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
 
-    const [addMenuTrackId, setAddMenuTrackId] = useState<number | null>(null);
+    const [addMenuTrackId, setAddMenuTrackId] = useState<string | null>(null);
 
 
-    const toggleAddMenu = (trackId: number) => {
+    const toggleAddMenu = (trackId: string) => {
         //console.log("trackId", trackId);
         setAddMenuTrackId(addMenuTrackId === trackId ? null : trackId);
     };
@@ -95,7 +95,7 @@ export default function ArtistDetails() {
     }
 
 
-    const handlePlayClick = (trackId: number) => {
+    const handlePlayClick = (trackId: string) => {
         // Si le morceau cliqué est déjà en lecture, on l'arrête
         setPlayingTrackId(playingTrackId === trackId ? null : trackId);
     };

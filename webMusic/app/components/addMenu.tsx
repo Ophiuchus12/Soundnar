@@ -5,7 +5,7 @@ import { addTrack } from "~/lib/Playlist";
 
 interface AddMenuProps {
     playlists: PlaylistPerso[];
-    idTrackDeezer: number;
+    idTrackDeezer: string;
     onClose: () => void;
 }
 
@@ -32,7 +32,8 @@ const AddMenu: React.FC<AddMenuProps> = ({ playlists, idTrackDeezer, onClose }) 
         try {
 
             //console.log("plazylistId", selectedPlaylist, "IdTrackDeezer", idTrackDeezer)
-            const response = await addTrack(selectedPlaylist, idTrackDeezer);
+            const idTrackString = idTrackDeezer.toString();
+            const response = await addTrack(selectedPlaylist, idTrackString);
 
             if (!response) {
                 setError(error || "An error occurred");
