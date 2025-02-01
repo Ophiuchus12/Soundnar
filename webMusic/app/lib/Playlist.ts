@@ -1,4 +1,4 @@
-import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse, playlistIdResponse, addTrackFavoriteResponse } from "~/types";
+import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse, playlistIdResponse, addTrackFavoriteResponse, deleteTrackFavoriteResponse } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -169,6 +169,26 @@ export async function addTrackFavorite(userId: string, idTrack: string): Promise
         return await response.json() as addTrackFavoriteResponse;
     } catch (error) {
         console.error("Erreur dans l'ajout d'une piste à vos favoris", error);
+        return null;
+    }
+}
+
+
+export async function deleteTrackfavorite(userId: string, idTrack: string): Promise<deleteTrackFavoriteResponse | null> {
+    const URL = `${url}/api/playlist/deleteTrackFavorite`;
+    const body = { userId, idTrack };
+    try {
+        const response = await fetch(URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        })
+        if (!response.ok) throw new Error("Erreur lors de la suppression d'une piste de vos favoris");
+        return await response.json() as deleteTrackFavoriteResponse;
+    } catch (error) {
+        console.error("Erreur dans la suppression d'une piste de vos favoris", error);
         return null;
     }
 }

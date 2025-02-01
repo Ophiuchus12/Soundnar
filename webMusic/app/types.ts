@@ -517,4 +517,9 @@ export interface getOneTrackData {
 }
 
 
-export interface addTrackFavoriteResponse { }
+export interface addTrackFavoriteResponse {
+    message: string;
+    track: TrackPerso;
+}
+
+export interface deleteTrackFavoriteResponse { }
