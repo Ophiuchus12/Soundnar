@@ -515,3 +515,6 @@ export interface getOneTrackData {
     album: Album;
     type: string;
 }
+
+
+export interface addTrackFavoriteResponse { }

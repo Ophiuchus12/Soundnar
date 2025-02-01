@@ -1,4 +1,4 @@
-import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse, playlistIdResponse } from "~/types";
+import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse, playlistIdResponse, addTrackFavoriteResponse } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -152,4 +152,23 @@ export function formatTime(seconds: number): string {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+export async function addTrackFavorite(userId: string, idTrack: string): Promise<addTrackFavoriteResponse | null> {
+    const URL = `${url}/api/playlist/addTrackFavorite`;
+    const body = { userId, idTrack };
+    try {
+        const response = await fetch(URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) throw new Error("Erreur lors de l'ajout d'une piste à vos favoris");
+        return await response.json() as addTrackFavoriteResponse;
+    } catch (error) {
+        console.error("Erreur dans l'ajout d'une piste à vos favoris", error);
+        return null;
+    }
 }
