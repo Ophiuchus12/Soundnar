@@ -478,3 +478,36 @@ export async function deleteTrackFavorite(req: Request, res: Response): Promise<
         res.status(500).json({ message: "Erreur serveur lors de la suppression de la chanson des favoris." });
     }
 }
+
+
+export async function getFavorites(req: Request, res: Response): Promise<void> {
+    const { userId } = req.body;
+
+    // Vérification de l'entrée
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
+    try {
+        // Récupérer la liste de favoris de l'utilisateur
+        const userFavorites = await prisma.favorites.findUnique({
+            where: {
+                userId,
+            },
+            include: {
+                tracks: true, // Inclure les pistes existantes dans les favoris
+            },
+        });
+
+        if (!userFavorites || userFavorites.tracks.length === 0) {
+            res.status(404).json({ message: "Aucune piste favorite trouvée pour cet utilisateur." });
+            return;
+        }
+
+        res.status(200).json({ favorites: userFavorites.tracks });
+    } catch (error) {
+        console.error("Erreur lors de la récupération des favoris:", error);
+        res.status(500).json({ message: "Erreur serveur lors de la récupération des favoris." });
+    }
+}

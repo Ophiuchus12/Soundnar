@@ -1,4 +1,4 @@
-import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse, playlistIdResponse, addTrackFavoriteResponse, deleteTrackFavoriteResponse } from "~/types";
+import { addTrackResponse, deleteTrackPlaylistResponse, responsePlaylistCreation, deletePlaylistResponse, updatePlaylistResponse, playlistAllResponse, playlistIdResponse, addTrackFavoriteResponse, deleteTrackFavoriteResponse, getFavoriteResponse } from "~/types";
 
 const url = "http://localhost:3000"
 
@@ -189,6 +189,26 @@ export async function deleteTrackfavorite(userId: string, idTrack: string): Prom
         return await response.json() as deleteTrackFavoriteResponse;
     } catch (error) {
         console.error("Erreur dans la suppression d'une piste de vos favoris", error);
+        return null;
+    }
+}
+
+
+export async function getFavoritePlaylist(userId: string): Promise<getFavoriteResponse | null> {
+    const URL = `${url}/api/playlist/getFavoritePlaylist`;
+    const body = { userId };
+    try {
+        const response = await fetch(URL, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+        });
+        if (!response.ok) throw new Error("Erreur lors de la récupération de vos playlists favorites");
+        return await response.json() as getFavoriteResponse;
+    } catch (error) {
+        console.error("Erreur dans la récupération de vos playlists favorites", error);
         return null;
     }
 }
