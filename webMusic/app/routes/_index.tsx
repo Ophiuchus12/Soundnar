@@ -473,16 +473,27 @@ export default function Index() {
                       {/* Overlay foncé au hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                      {/* Bouton "Add to playlist" */}
-                      {isAuthenticated && (
+                      <div className="absolute top-2 left-2 right-2 flex justify-between">
+                        {/* Bouton "Add to Favorites" */}
                         <button
-                          onClick={() => toggleAddMenu(track.id)}
-                          className="absolute top-2 right-2 p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
-                          aria-label="Add to playlist"
+                          onClick={() => setIdFav(track.id)}
+                          className="rounded-full p-2 transition-all bg-gray-800 text-gray-400 hover:bg-purple-600 hover:text-white"
+                          aria-label="Add to Favorites"
                         >
-                          <PiMusicNotesPlus className="h-6 w-6 text-white" />
+                          <CiCirclePlus className="w-6 h-6 text-white" />
                         </button>
-                      )}
+
+                        {/* Bouton "Add to Playlist" */}
+                        {isAuthenticated && (
+                          <button
+                            onClick={() => toggleAddMenu(track.id)}
+                            className="p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md "
+                            aria-label="Add to playlist"
+                          >
+                            <PiMusicNotesPlus className="h-6 w-6 text-white" />
+                          </button>
+                        )}
+                      </div>
                     </div>
 
                     {/* Infos de la track */}
