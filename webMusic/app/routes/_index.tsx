@@ -10,7 +10,8 @@ import { commitSession, getSession } from "~/session.server";
 import { getMe, verify } from "~/lib/User";
 import { PiMusicNotesPlus } from "react-icons/pi";
 import AddMenu from "~/components/addMenu";
-import { getAllPlaylists } from "~/lib/Playlist";
+import { addTrackFavorite, getAllPlaylists } from "~/lib/Playlist";
+import { CiCirclePlus } from "react-icons/ci";
 
 export const loader: LoaderFunction = async ({ request }) => {
   // Handle session and authentication
@@ -62,6 +63,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         token,
         error,
         userName,
+        userId,
         playlists,
         albums: chartAlbum.data,
         artists: chartArtist.data,
@@ -83,6 +85,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         isAuthenticated,
         token,
         userName,
+        userId,
         playlists,
         error: error,
         albums: [],
@@ -123,7 +126,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 
 export default function Index() {
-  const { albums, artists, tracks, genres, isAuthenticated, token, userName, error, playlists } = useLoaderData<{
+  const { albums, artists, tracks, genres, isAuthenticated, token, userName, userId, error, playlists } = useLoaderData<{
     albums: Album[];
     artists: Artist[];
     tracks: Track[];
@@ -132,6 +135,7 @@ export default function Index() {
     playlists: PlaylistPerso[];
     token: string | null;
     userName: string | null;
+    userId: string;
     error: string | null;
   }>();
 
@@ -141,6 +145,8 @@ export default function Index() {
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
+  const [idFav, setIdFav] = useState<string | null>("");
+
   const navigate = useNavigate();
 
   const [addMenuTrackId, setAddMenuTrackId] = useState<string | null>(null);
@@ -180,6 +186,24 @@ export default function Index() {
   const handleClickAlbum = (idAlbum: number) => {
     navigate(`/albumDetails/${idAlbum}`);
   };
+
+  const addFavorite = async () => {
+    if (!idFav || !userId) {
+      // Si idFav ou userId sont absents, on ne fait rien
+      return;
+    }
+
+    try {
+      const idTrack = idFav.toString();
+      await addTrackFavorite(userId, idTrack);
+      console.log("Track added to favorites successfully!");
+      setIdFav(null);
+    } catch (error) {
+      console.error("Error adding track to favorites:", error);
+    }
+  };
+
+  const toggleForm = () => { setIdFav(null); }
 
   return (
     <>
@@ -254,17 +278,29 @@ export default function Index() {
                       key={track.id}
                       className="flex items-center bg-gray-900 p-4 rounded-lg hover:bg-gray-700 transition cursor-pointer"
                     >
+                      {/* Bouton + avant l'image */}
+                      <button
+                        onClick={() => setIdFav(track.id)} // Ajouter aux favoris
+                        className="rounded-full p-2 mr-3 transition-all bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                        aria-label="Add to Favorites"
+                      >
+                        <CiCirclePlus className="w-6 h-6 text-white" />
+                      </button>
+
                       {/* Thumbnail */}
                       <img
                         src={`https://e-cdns-images.dzcdn.net/images/cover/${track.md5_image}/250x250-000000-80-0-0.jpg`}
                         alt={track.title}
                         className="w-16 h-16 object-cover rounded-lg"
                       />
+
                       {/* Details */}
                       <div className="ml-4 flex-1">
                         <h3 className="text-white text-base font-medium">{track.title}</h3>
                         <p className="text-gray-400 text-sm">by {track.artist.name}</p>
                       </div>
+
+                      {/* Actions */}
                       <div className="flex items-center justify-end gap-4">
                         {/* Bouton Lecture */}
                         <button
@@ -288,9 +324,7 @@ export default function Index() {
                             <PiMusicNotesPlus className="h-5 w-5 text-white" />
                           </button>
                         )}
-
                       </div>
-
                       {/* Affichage conditionnel du menu d'ajout */}
                       {addMenuTrackId === track.id && (
                         <AddMenu idTrackDeezer={track.id} playlists={playlists} onClose={() => setAddMenuTrackId(null)} />
@@ -484,6 +518,35 @@ export default function Index() {
 
 
           </>
+        )}
+
+        {idFav && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">
+            <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md transform transition-transform duration-300 ease-in-out scale-95 hover:scale-100">
+              <h2 className="text-2xl font-semibold text-white mb-6">Add to favorite ?</h2>
+
+              <div className="flex justify-between items-center mt-6">
+                <button
+                  type="button"
+                  className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                  onClick={addFavorite}
+                >
+                  Add to favorite
+                </button>
+
+                <div className="w-4" />
+
+                <button
+                  type="button"
+                  onClick={toggleForm}
+                  className="bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                >
+                  Cancel
+                </button>
+              </div>
+
+            </div>
+          </div>
         )}
       </div >
     </>
