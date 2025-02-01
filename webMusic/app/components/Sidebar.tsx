@@ -1,7 +1,8 @@
 import { NavLink } from "@remix-run/react";
 import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
 import { GiCompactDisc } from "react-icons/gi";
-import { IoAlbumsOutline, IoPersonOutline } from "react-icons/io5";
+import { IoAlbumsOutline } from "react-icons/io5";
+import { FaHeart } from "react-icons/fa";
 import { useState } from "react";
 
 
@@ -67,6 +68,21 @@ export default function Sidebar() {
                             >
                                 <IoAlbumsOutline className="text-xl" />
                                 Albums
+                            </NavLink>
+                        </div>
+                    </li>
+
+                    <li>
+                        <div className="space-between">
+                            <NavLink
+                                to="/favorites"
+                                className={({ isActive }) =>
+                                    `flex items-center gap-x-3 w-full p-3 rounded transition-colors ${isActive ? "bg-[#7600be]" : "hover:bg-gray-700"
+                                    }`
+                                }
+                            >
+                                <FaHeart className="text-xl" />
+                                Favorites
                             </NavLink>
                         </div>
                     </li>
