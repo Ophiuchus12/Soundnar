@@ -10,6 +10,7 @@ import { PlaylistPerso } from '~/types';
 
 
 
+
 export const loader: LoaderFunction = async ({ request }) => {
     const session = await getSession(request.headers.get("Cookie"));
     const token = session.get("authToken");
@@ -130,43 +131,50 @@ export default function Playlists() {
     };
 
     return (
-        <div className="min-h-screen text-white flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center px-6 py-10">
             {isAuthenticated ? (
-                <div>
-                    <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
-                    <p className="text-lg mt-2">Your Playlists</p>
-                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="w-full max-w-5xl">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6">
+                        <div>
+                            <h1 className="text-3xl font-bold">Welcome, {userName}</h1>
+                            <p className="text-lg text-gray-400">Your Playlists</p>
+                        </div>
+                        <button
+                            onClick={toggleForm}
+                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                        >
+                            Add a Playlist
+                        </button>
+                    </div>
+
+                    {/* Playlists Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {playlists.length > 0 ? (
                             playlists.map((playlist) => (
                                 <div
                                     key={playlist.idPlaylist}
-                                    className="group relative bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer 
-                                    transform transition-transform duration-300 ease-in-out scale-100 hover:scale-105"
+                                    className="group relative bg-white/10 backdrop-blur-lg p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer transform scale-100 hover:scale-105"
                                     onClick={() => handleClickPlaylist(playlist.idPlaylist)}
                                 >
                                     {/* Playlist Title */}
-                                    <h2 className="text-2xl font-semibold text-white group-hover:text-[#7600be] transition-colors duration-300">
+                                    <h2 className="text-2xl font-semibold truncate text-white group-hover:text-[#7600be] transition-colors duration-300">
                                         {playlist.title}
                                     </h2>
 
                                     {/* Playlist Info */}
-                                    <div className="mt-2">
-                                        <p className="text-sm text-gray-400">
-                                            <span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}
-                                        </p>
-                                        <p className="mt-1 text-sm text-gray-400">
-                                            <span className="font-bold text-white">Duration:</span> {formatTime(playlist.duration)}
-                                        </p>
+                                    <div className="mt-2 text-gray-300">
+                                        <p><span className="font-bold text-white">Tracks:</span> {playlist.nbTracks}</p>
+                                        <p><span className="font-bold text-white">Duration:</span> {formatTime(playlist.duration)}</p>
                                     </div>
 
-                                    {/* Delete Icon with Hover Effect */}
+                                    {/* Delete Button */}
                                     <button
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Prevent triggering the playlist click
+                                            e.stopPropagation();
                                             handleDeletePlaylist(playlist.idPlaylist);
                                         }}
                                         className="absolute bottom-3 right-3 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-200"
-                                        aria-label="Delete Playlist"
                                     >
                                         <FaTrash />
                                     </button>
@@ -178,41 +186,29 @@ export default function Playlists() {
                             </p>
                         )}
                     </div>
-
-                    {/* Add Playlist Button */}
-                    <div className="mt-6 flex justify-center">
-                        <button
-                            onClick={toggleForm}
-                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-2 px-4 rounded-lg transition-all duration-200"
-                        >
-                            Add a Playlist
-                        </button>
-                    </div>
                 </div>
             ) : (
-                <div className="max-w-md text-center bg-gray-800 p-6 rounded-lg shadow-lg">
-                    <h1 className="text-4xl font-bold mb-4">Limited access</h1>
-                    <p className="text-lg mb-6">
-                        Log in to access your playlists, manage your favorites,
-                        and enjoy a personalized music experience.
+                <div className="max-w-md text-center bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg">
+                    <h1 className="text-4xl font-bold mb-4">Limited Access</h1>
+                    <p className="text-lg text-gray-300 mb-6">
+                        Log in to manage your playlists and enjoy a personalized music experience.
                     </p>
-                    <div className="flex justify-center">
+                    <div className="flex justify-center gap-4">
                         <a
                             href="/auth"
-                            className="bg-[#7600be] hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-all duration-200"
+                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
                         >
                             Login
                         </a>
                         <a
                             href="/auth"
-                            className="ml-4 bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg transition-all duration-200"
+                            className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
                         >
-                            Signin
+                            Sign Up
                         </a>
                     </div>
                 </div>
             )}
-
             {/* Modal Add Playlist */}
             {isFormVisible && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">

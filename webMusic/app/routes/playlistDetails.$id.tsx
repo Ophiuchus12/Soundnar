@@ -71,11 +71,8 @@ export default function PlaylistDetails() {
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null); // Stocke l'ID du track en cours de lecture
 
   const handlePlayClick = (trackId: string) => {
-    if (playingTrackId === trackId) {
-      setPlayingTrackId(null); // Arrête la chanson si c'est la même chanson
-    } else {
-      setPlayingTrackId(trackId); // Démarre la chanson si c'est une autre chanson
-    }
+    // Si le morceau cliqué est déjà en lecture, on l'arrête
+    setPlayingTrackId(playingTrackId === trackId ? null : trackId);
   };
 
   // Fonction pour récupérer les tracks
@@ -85,7 +82,7 @@ export default function PlaylistDetails() {
         const trackData: getOneTrackData[] = [];
         for (const track of playlist.songs) {
           const res = await getTrackById(track.idTrackDeezer);
-          console.log("res", res);
+          //console.log("res", res);
           if (res) {
             trackData.push(res);
           }
@@ -117,12 +114,6 @@ export default function PlaylistDetails() {
       }
     }
   };
-
-
-
-
-
-
 
   const navigate = useNavigate();
   return (
@@ -177,7 +168,7 @@ export default function PlaylistDetails() {
                         className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-200"
                         aria-label="Delete Track"
                       >
-                        <FaTrash />
+                        <FaTrash size={20} />
                       </button>
 
                       {/* Bouton de lecture/arrêt */}
@@ -192,8 +183,16 @@ export default function PlaylistDetails() {
                         <GiMusicSpell size={20} />
                       </button>
                     </div>
+                    {/* Affichage conditionnel du lecteur audio */}
+                    {playingTrackId === track.id && (
+                      <audio className="hidden" controls autoPlay>
+                        <source src={track.preview} type="audio/mpeg" />
+                        Votre navigateur ne supporte pas l'élément audio.
+                      </audio>
+                    )}
 
                   </div>
+
                 ))
               ) : (
                 <p className="text-gray-400">No tracks found</p>

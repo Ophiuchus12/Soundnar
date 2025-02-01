@@ -89,12 +89,6 @@ export default function Albums() {
                         <p className="text-gray-400 mb-6">
                             Try refining your search or explore our trending albums!
                         </p>
-                        <button
-                            onClick={() => navigate('/')}
-                            className="bg-purple-600 text-white font-semibold px-6 py-3 rounded-lg shadow hover:bg-purple-700 transition"
-                        >
-                            Explore Trending Albums
-                        </button>
                     </div>
                 )
                 }
