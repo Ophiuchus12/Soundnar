@@ -1,7 +1,7 @@
 import { NavLink } from "@remix-run/react";
 import { PiMicrophoneStageFill, PiPlaylistBold } from "react-icons/pi";
 import { GiCompactDisc } from "react-icons/gi";
-import { IoAlbumsOutline } from "react-icons/io5";
+import { IoAlbumsSharp } from "react-icons/io5";
 import { FaHeart } from "react-icons/fa";
 import { useState } from "react";
 
@@ -66,7 +66,7 @@ export default function Sidebar() {
                                     }`
                                 }
                             >
-                                <IoAlbumsOutline className="text-xl" />
+                                <IoAlbumsSharp className="text-xl" />
                                 Albums
                             </NavLink>
                         </div>

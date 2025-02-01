@@ -446,7 +446,7 @@ export default function Index() {
                           className="absolute top-2 right-2 p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
                           aria-label="Add to playlist"
                         >
-                          <PiMusicNotesPlus className="h-5 w-5 text-white" />
+                          <PiMusicNotesPlus className="h-6 w-6 text-white" />
                         </button>
                       )}
                     </div>
@@ -463,7 +463,7 @@ export default function Index() {
                           }`}
                         aria-label={playingTrackId === track.id ? "Stop" : "Play"}
                       >
-                        <GiMusicSpell />
+                        <GiMusicSpell className="text-white" />
                       </button>
                     </div>
                     <p className="text-gray-400 text-sm truncate mt-2">by {track.artist.name}</p>

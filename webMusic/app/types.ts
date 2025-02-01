@@ -529,4 +529,6 @@ export interface deleteTrackFavoriteResponse {
 }
 
 
-export interface getFavoriteResponse { }
+export interface getFavoriteResponse {
+    favorites: TrackPerso[];
+}
