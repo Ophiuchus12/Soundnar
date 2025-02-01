@@ -517,9 +517,16 @@ export interface getOneTrackData {
 }
 
 
+////////favorites
+
 export interface addTrackFavoriteResponse {
     message: string;
     track: TrackPerso;
 }
 
-export interface deleteTrackFavoriteResponse { }
+export interface deleteTrackFavoriteResponse {
+    message: string;
+}
+
+
+export interface getFavoriteResponse { }
