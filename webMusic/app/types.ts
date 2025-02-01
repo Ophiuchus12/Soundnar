@@ -515,3 +515,18 @@ export interface getOneTrackData {
     album: Album;
     type: string;
 }
+
+
+////////favorites
+
+export interface addTrackFavoriteResponse {
+    message: string;
+    track: TrackPerso;
+}
+
+export interface deleteTrackFavoriteResponse {
+    message: string;
+}
+
+
+export interface getFavoriteResponse { }

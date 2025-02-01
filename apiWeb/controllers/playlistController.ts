@@ -311,3 +311,203 @@ export async function getPlaylistById(req: Request, res: Response): Promise<void
         res.status(500).json({ message: "Erreur serveur lors de la récupération de la playlist." });
     }
 }
+
+export async function addTrackFavorite(req: Request, res: Response): Promise<void> {
+    const { idTrack, userId } = req.body;
+
+    // Validation des entrées
+    if (!idTrack || typeof idTrack !== "string") {
+        res.status(400).json({ message: "L'identifiant de la piste est invalide." });
+        return;
+    }
+
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
+    try {
+        // Récupérer les détails de la piste depuis l'API Deezer
+        const responseTrack = await fetchTrack(idTrack);
+
+        if (!responseTrack) {
+            res.status(404).json({ message: "La piste n'a pas été trouvée sur Deezer." });
+            return;
+        }
+
+        const idTrackDeezer = idTrack;
+        const title = responseTrack.title;
+        const duration = parseInt(responseTrack.duration, 10); // Convertir la durée en entier
+        const preview = responseTrack.preview;
+        const md5Image = responseTrack.md5_image;
+        const artistId = responseTrack.artist.id;
+        const albumId = responseTrack.album.id;
+
+        // Vérifier si la piste existe déjà dans la base de données
+        let track = await prisma.track.findUnique({
+            where: {
+                idTrackDeezer,
+            },
+        });
+
+        // Si la piste n'existe pas, l'ajouter à la base de données
+        if (!track) {
+            track = await prisma.track.create({
+                data: {
+                    idTrackDeezer,
+                    title,
+                    duration,
+                    preview,
+                    md5Image,
+                    artistId,
+                    albumId,
+                },
+            });
+        }
+
+        // Récupérer les favoris de l'utilisateur
+        const userFavorites = await prisma.favorites.findUnique({
+            where: {
+                userId: userId,
+            },
+            include: {
+                tracks: true, // Inclure les pistes existantes dans les favoris
+            },
+        });
+
+        // Si l'utilisateur n'a pas de liste de favoris, en créer une nouvelle
+        if (!userFavorites) {
+            await prisma.favorites.create({
+                data: {
+                    userId: userId,
+                    tracks: {
+                        connect: {
+                            idTrack: track.idTrack, // Ajouter la chanson aux favoris
+                        },
+                    },
+                },
+            });
+            res.status(201).json({ message: "La chanson a été ajoutée aux favoris.", track });
+        } else {
+            // Vérifier si la chanson est déjà dans les favoris
+            const trackExistsInFavorites = userFavorites.tracks.some(
+                (favTrack) => favTrack.idTrackDeezer === track.idTrackDeezer
+            );
+
+            if (trackExistsInFavorites) {
+                res.status(409).json({ message: "Cette chanson est déjà dans les favoris.", track });
+            } else {
+                // Ajouter la chanson aux favoris de l'utilisateur
+                await prisma.favorites.update({
+                    where: {
+                        userId: userId,
+                    },
+                    data: {
+                        tracks: {
+                            connect: {
+                                idTrack: track.idTrack, // Connecter la chanson à l'utilisateur
+                            },
+                        },
+                    },
+                });
+                res.status(200).json({ message: "La chanson a été ajoutée aux favoris.", track });
+            }
+        }
+
+    } catch (err) {
+        console.error("Erreur dans addTrackFavorite:", err);
+        res.status(500).json({ message: "Erreur serveur lors de l'ajout de la chanson aux favoris." });
+    }
+}
+
+export async function deleteTrackFavorite(req: Request, res: Response): Promise<void> {
+    const { idTrack, userId } = req.body;
+
+    // Vérification des entrées
+    if (!idTrack || typeof idTrack !== "string") {
+        res.status(400).json({ message: "L'identifiant de la piste est invalide." });
+        return;
+    }
+
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
+    try {
+        // Récupérer la liste de favoris de l'utilisateur
+        const userFavorites = await prisma.favorites.findUnique({
+            where: {
+                userId: userId,
+            },
+            include: {
+                tracks: true,
+            },
+        });
+
+        if (!userFavorites) {
+            res.status(404).json({ message: "Aucune liste de favoris trouvée pour cet utilisateur." });
+            return;
+        }
+
+        // Vérifier si la chanson est dans les favoris
+        const trackExistsInFavorites = userFavorites.tracks.find(track => track.idTrackDeezer === idTrack);
+
+        if (!trackExistsInFavorites) {
+            res.status(404).json({ message: "Cette chanson n'est pas dans les favoris." });
+            return;
+        }
+
+        // Supprimer la chanson des favoris
+        await prisma.favorites.update({
+            where: {
+                userId: userId,
+            },
+            data: {
+                tracks: {
+                    disconnect: {
+                        idTrack: trackExistsInFavorites.idTrack,
+                    },
+                },
+            },
+        });
+
+        res.status(200).json({ message: "La chanson a été supprimée des favoris avec succès." });
+    } catch (error) {
+        console.error("Erreur lors de la suppression de la chanson des favoris:", error);
+        res.status(500).json({ message: "Erreur serveur lors de la suppression de la chanson des favoris." });
+    }
+}
+
+
+export async function getFavorites(req: Request, res: Response): Promise<void> {
+    const { userId } = req.body;
+
+    // Vérification de l'entrée
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
+    try {
+        // Récupérer la liste de favoris de l'utilisateur
+        const userFavorites = await prisma.favorites.findUnique({
+            where: {
+                userId,
+            },
+            include: {
+                tracks: true, // Inclure les pistes existantes dans les favoris
+            },
+        });
+
+        if (!userFavorites || userFavorites.tracks.length === 0) {
+            res.status(404).json({ message: "Aucune piste favorite trouvée pour cet utilisateur." });
+            return;
+        }
+
+        res.status(200).json({ favorites: userFavorites.tracks });
+    } catch (error) {
+        console.error("Erreur lors de la récupération des favoris:", error);
+        res.status(500).json({ message: "Erreur serveur lors de la récupération des favoris." });
+    }
+}
