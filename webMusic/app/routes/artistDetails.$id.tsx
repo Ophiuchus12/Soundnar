@@ -1,12 +1,13 @@
 import { LoaderFunction, LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
+import { CiCirclePlus } from 'react-icons/ci';
 import { FaArrowLeft } from 'react-icons/fa';
 import { GiMusicSpell } from 'react-icons/gi';
 import { PiMusicNotesPlus } from 'react-icons/pi';
 import AddMenu from '~/components/addMenu';
 import { getArtist, getArtistAlbums, getArtistTopSong } from '~/lib/Music';
-import { getAllPlaylists } from '~/lib/Playlist';
+import { addTrackFavorite, getAllPlaylists } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
 import { ArtistDetail, ArtistDetailAlbumList, ArtistTopSongList, PlaylistPerso } from '~/types';
@@ -57,25 +58,46 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
 
 
 
-    return { artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong, isAuthenticated: true, error: null, token: token, playlists: playlists }
+    return { artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong, isAuthenticated: true, error: null, token: token, userId: userId, playlists: playlists }
 
 }
 
 
 export default function ArtistDetails() {
 
-    const { artistData, artistDataAlbums, topArtistDataSong, isAuthenticated, token, error, playlists } = useLoaderData<{
+    const { artistData, artistDataAlbums, topArtistDataSong, isAuthenticated, token, userId, error, playlists } = useLoaderData<{
         artistData: ArtistDetail;
         artistDataAlbums: ArtistDetailAlbumList;
         topArtistDataSong: ArtistTopSongList;
         isAuthenticated: boolean;
         token: string | null;
+        userId: string | null;
         playlists: PlaylistPerso[];
         error: string | null;
     }>();
     const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
 
     const [addMenuTrackId, setAddMenuTrackId] = useState<string | null>(null);
+
+    const [idFav, setIdFav] = useState<string | null>("");
+
+    const addFavorite = async () => {
+        if (!idFav || !userId) {
+            // Si idFav ou userId sont absents, on ne fait rien
+            return;
+        }
+
+        try {
+            const idTrack = idFav.toString();
+            await addTrackFavorite(userId, idTrack);
+            console.log("Track added to favorites successfully!");
+            setIdFav(null);
+        } catch (error) {
+            console.error("Error adding track to favorites:", error);
+        }
+    };
+
+    const toggleForm = () => { setIdFav(null); }
 
 
     const toggleAddMenu = (trackId: string) => {
@@ -151,9 +173,21 @@ export default function ArtistDetails() {
                     >
                         {topArtistDataSong.data.map((track) => (
                             <div key={track.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-4 hover:bg-gray-600">
-                                <div className="flex flex-col">
-                                    <h1 className="text-white text-lg">{track?.title}</h1>
-                                    <h2 className="text-gray-400 text-sm">{formatDuration(track.duration)}</h2>
+                                <div className="flex items-center space-x-4">
+                                    {/* Bouton Play/Stop */}
+                                    <button
+                                        onClick={() => setIdFav(track.id)}
+                                        className="rounded-full p-2 transition-all bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                                        aria-label="Add to Favorites"
+                                    >
+                                        <CiCirclePlus className="w-6 h-6 text-white" />
+                                    </button>
+
+                                    {/* Informations sur la piste */}
+                                    <div className="flex flex-col">
+                                        <h1 className="text-white text-lg">{track?.title}</h1>
+                                        <h2 className="text-gray-400 text-sm">{formatDuration(track.duration)}</h2>
+                                    </div>
                                 </div>
 
                                 <div className="flex items-center justify-end gap-4">
@@ -201,6 +235,34 @@ export default function ArtistDetails() {
                             </div>
                         ))}
                     </div>
+                    {idFav && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">
+                            <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md transform transition-transform duration-300 ease-in-out scale-95 hover:scale-100">
+                                <h2 className="text-2xl font-semibold text-white mb-6">Add to favorite ?</h2>
+
+                                <div className="flex justify-between items-center mt-6">
+                                    <button
+                                        type="button"
+                                        className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                                        onClick={addFavorite}
+                                    >
+                                        Add to favorite
+                                    </button>
+
+                                    <div className="w-4" />
+
+                                    <button
+                                        type="button"
+                                        onClick={toggleForm}
+                                        className="bg-gray-700 hover:bg-gray-600 text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="w-1/2">
