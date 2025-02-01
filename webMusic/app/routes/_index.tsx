@@ -135,23 +135,24 @@ export default function Index() {
     error: string | null;
   }>();
 
-  console.log("test", isAuthenticated)
+  //console.log("test", isAuthenticated)
 
 
   const [searchValue, setSearchValue] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
-  const [playingTrackId, setPlayingTrackId] = useState<number | null>(null);
+  const [playingTrackId, setPlayingTrackId] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const [addMenuTrackId, setAddMenuTrackId] = useState<number | null>(null);
+  const [addMenuTrackId, setAddMenuTrackId] = useState<string | null>(null);
 
 
-  const toggleAddMenu = (trackId: number) => {
+  const toggleAddMenu = (trackId: string) => {
     //console.log("trackId", trackId);
     setAddMenuTrackId(addMenuTrackId === trackId ? null : trackId);
+    console.log("add", addMenuTrackId);
   };
 
-  const handlePlayClick = (trackId: number) => {
+  const handlePlayClick = (trackId: string) => {
     setPlayingTrackId(playingTrackId === trackId ? null : trackId);
   };
 
@@ -419,6 +420,8 @@ export default function Index() {
             {/* Liste des morceaux */}
             <div className="w-full bg-black p-6 rounded-lg mb-10">
               <h2 className="text-white text-3xl font-semibold text-center mb-8">Top Tracks</h2>
+
+              {/* Grille des tracks */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
                 {tracks.map((track) => (
                   <div
@@ -426,16 +429,32 @@ export default function Index() {
                     className="bg-black/40 backdrop-blur-sm rounded-xl p-4 transform hover:scale-105 transition-all duration-300 group"
                   >
                     <div className="relative mb-4">
+                      {/* Image de la track */}
                       <img
                         className="w-full h-48 object-cover rounded-lg shadow-lg group-hover:shadow-purple-500/50"
                         src={`https://e-cdns-images.dzcdn.net/images/cover/${track.md5_image}/500x500-000000-80-0-0.jpg`}
                         alt={track.title}
                       />
+
+                      {/* Overlay foncé au hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                      {/* Bouton "Add to playlist" */}
+                      {isAuthenticated && (
+                        <button
+                          onClick={() => toggleAddMenu(track.id)}
+                          className="absolute top-2 right-2 p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md opacity-0 group-hover:opacity-100 scale-90 group-hover:scale-100"
+                          aria-label="Add to playlist"
+                        >
+                          <PiMusicNotesPlus className="h-5 w-5 text-white" />
+                        </button>
+                      )}
                     </div>
 
+                    {/* Infos de la track */}
                     <div className="flex items-center justify-between space-x-4">
                       <h3 className="font-bold text-white text-lg truncate">{track.title}</h3>
+
                       <button
                         onClick={() => handlePlayClick(track.id)}
                         className={`rounded-full p-2 transition-all ${playingTrackId === track.id
@@ -448,20 +467,25 @@ export default function Index() {
                       </button>
                     </div>
                     <p className="text-gray-400 text-sm truncate mt-2">by {track.artist.name}</p>
-
-                    {playingTrackId === track.id && (
-                      <audio className="hidden" controls autoPlay>
-                        <source src={track.preview} type="audio/mpeg" />
-                        Votre navigateur ne supporte pas l'élément audio.
-                      </audio>
-                    )}
                   </div>
                 ))}
               </div>
+
+              {/* Affichage conditionnel du menu d'ajout */}
+              {addMenuTrackId && (
+                <AddMenu
+                  idTrackDeezer={addMenuTrackId}
+                  playlists={playlists}
+                  onClose={() => setAddMenuTrackId(null)}
+                />
+              )}
             </div>
+
+
+
           </>
         )}
-      </div>
+      </div >
     </>
   );
 }

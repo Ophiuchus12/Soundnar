@@ -32,9 +32,10 @@ export async function createPlaylist(
     }
 }
 
-export async function addTrack(idPlaylist: string, idTrack: number): Promise<addTrackResponse | null> {
+export async function addTrack(idPlaylist: string, idTrack: string): Promise<addTrackResponse | null> {
     const URL = `${url}/api/playlist/addTrack`;
     const body = { idPlaylist, idTrack };
+    //console.log("body", body);
     try {
         const response = await fetch(URL, {
             method: "POST",
@@ -54,9 +55,10 @@ export async function addTrack(idPlaylist: string, idTrack: number): Promise<add
 export async function deleteTrackPlaylist(idPlaylist: string, idTrack: string): Promise<deleteTrackPlaylistResponse | null> {
     const URL = `${url}/api/playlist/deleteTrack`;
     const body = { idPlaylist, idTrack };
+    //console.log("body", body);
     try {
         const response = await fetch(URL, {
-            method: "DELETE",
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -110,7 +112,7 @@ export async function updatePlaylist(idPlaylist: string, title: string): Promise
 export async function getAllPlaylists(userId: string): Promise<playlistAllResponse | null> {
     const URL = `${url}/api/playlist/allPlaylists`;
     const body = { userId };
-    //console.log("json log ", JSON.stringify(body));
+    console.log("json log ", JSON.stringify(body));
     try {
         const response = await fetch(URL, {
             method: "POST",

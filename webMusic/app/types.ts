@@ -52,7 +52,7 @@ export interface Artist {
 
 
 export interface Track {
-    id: number;
+    id: string;
     title: string;
     title_short: string;
     title_version: string;
@@ -218,7 +218,7 @@ export interface ArtistTopSongList {
 }
 
 export interface ArtistTopSong {
-    id: number;
+    id: string;
     readable: boolean;
     title: string;
     title_short: string;
@@ -305,7 +305,7 @@ export interface ArtistSearch {
 
 
 export interface DeezerGlobal {
-    id: number;
+    id: string;
     readable: boolean;
     title: string;
     title_short: string;
@@ -339,7 +339,7 @@ export interface DeezerGlobal {
 
 
 export interface AlbumSearch {
-    id: number;
+    id: string;
     title: string;
     link: string;
     cover: string;
@@ -358,7 +358,7 @@ export interface AlbumSearch {
 }
 
 export interface TrackSearch {
-    id: number;
+    id: string;
     readable: boolean; // Indique si le morceau est lisible
     title: string;
     title_short: string;
@@ -445,7 +445,7 @@ export interface PlaylistPerso {
 
 export interface TrackPerso {
     idTrack: string;
-    idTrackDeezer: number;
+    idTrackDeezer: string;
     title: string;
     duration: number;
     preview: string;

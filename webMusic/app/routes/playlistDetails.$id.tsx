@@ -1,10 +1,10 @@
 import { LoaderFunction } from '@remix-run/node'
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
-import { FaArrowLeft } from 'react-icons/fa';
+import { FaArrowLeft, FaTrash } from 'react-icons/fa';
 import { GiMusicSpell } from 'react-icons/gi';
 import { getTrackById } from '~/lib/Music';
-import { formatTime, getPlaylistById } from '~/lib/Playlist';
+import { deleteTrackPlaylist, formatTime, getPlaylistById } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server'
 import { getOneTrackData, PlaylistPerso, TrackPerso } from '~/types';
@@ -71,11 +71,8 @@ export default function PlaylistDetails() {
   const [playingTrackId, setPlayingTrackId] = useState<string | null>(null); // Stocke l'ID du track en cours de lecture
 
   const handlePlayClick = (trackId: string) => {
-    if (playingTrackId === trackId) {
-      setPlayingTrackId(null); // Arrête la chanson si c'est la même chanson
-    } else {
-      setPlayingTrackId(trackId); // Démarre la chanson si c'est une autre chanson
-    }
+    // Si le morceau cliqué est déjà en lecture, on l'arrête
+    setPlayingTrackId(playingTrackId === trackId ? null : trackId);
   };
 
   // Fonction pour récupérer les tracks
@@ -85,7 +82,7 @@ export default function PlaylistDetails() {
         const trackData: getOneTrackData[] = [];
         for (const track of playlist.songs) {
           const res = await getTrackById(track.idTrackDeezer);
-          console.log("res", res);
+          //console.log("res", res);
           if (res) {
             trackData.push(res);
           }
@@ -103,12 +100,20 @@ export default function PlaylistDetails() {
     fetchTracks();
   }, [playlist]);
 
+  const handleDeleteTrack = async (idTrack: string, idPlaylist: string | undefined) => {
+    if (idTrack !== undefined && idPlaylist !== undefined) {
+      try {
+        const IdTrackString = idTrack.toString();
+        const handleDelete = await deleteTrackPlaylist(idPlaylist, IdTrackString);
+        if (handleDelete) {
 
-
-
-
-
-
+          navigate(`/playlistDetails/${idPlaylist}`);
+        }
+      } catch (err) {
+        console.error("Erreur lors de la suppression de la playlist :", err);
+      }
+    }
+  };
 
   const navigate = useNavigate();
   return (
@@ -138,7 +143,7 @@ export default function PlaylistDetails() {
                 tracks.map((track) => (
                   <div
                     key={track.id}
-                    className="bg-gray-800 p-4 rounded-lg shadow-lg flex items-center justify-between hover:bg-[#3b1d79] transition-all"
+                    className="relative bg-gray-800 p-4 rounded-lg shadow-lg flex items-center justify-between hover:bg-[#3b1d79] transition-all group"
                   >
                     {/* Image de couverture */}
                     <img
@@ -153,12 +158,23 @@ export default function PlaylistDetails() {
                       <p className="text-sm text-gray-400 truncate">by {track.artist.name}</p>
                     </div>
 
-                    {/* Contrôles */}
-                    <div className="flex items-center space-x-4">
+                    <div className="flex items-center space-x-2">
+                      {/* Bouton de suppression */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation(); // Empêche le clic de déclencher l'action parent
+                          handleDeleteTrack(track.id, playlist?.idPlaylist);
+                        }}
+                        className="bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 hover:scale-110 transition-all duration-200"
+                        aria-label="Delete Track"
+                      >
+                        <FaTrash size={20} />
+                      </button>
+
                       {/* Bouton de lecture/arrêt */}
                       <button
                         onClick={() => handlePlayClick(track.id)}
-                        className={`rounded-full p-3 transition-all shadow-md ${playingTrackId === track.id
+                        className={`flex items-center justify-center w-10 h-10 rounded-full transition-all shadow-md ${playingTrackId === track.id
                           ? "bg-purple-600 text-white"
                           : "bg-gray-700 text-gray-400 hover:bg-purple-800 hover:text-white"
                           }`}
@@ -166,16 +182,17 @@ export default function PlaylistDetails() {
                       >
                         <GiMusicSpell size={20} />
                       </button>
-
-                      {/* Audio contrôlé */}
-                      {playingTrackId === track.id && (
-                        <audio className="hidden" controls autoPlay>
-                          <source src={track.preview} type="audio/mpeg" />
-                          Votre navigateur ne supporte pas l'élément audio.
-                        </audio>
-                      )}
                     </div>
+                    {/* Affichage conditionnel du lecteur audio */}
+                    {playingTrackId === track.id && (
+                      <audio className="hidden" controls autoPlay>
+                        <source src={track.preview} type="audio/mpeg" />
+                        Votre navigateur ne supporte pas l'élément audio.
+                      </audio>
+                    )}
+
                   </div>
+
                 ))
               ) : (
                 <p className="text-gray-400">No tracks found</p>
