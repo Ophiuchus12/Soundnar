@@ -129,10 +129,36 @@ export default function Playlists() {
             }
         }
     };
+    if (!isAuthenticated) {
+        return (
+            <div className="flex w-full h-full items-center justify-center ">
+                <div className="max-w-md text-center bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg">
+                    <h1 className="text-4xl text-white font-bold mb-4">Limited Access</h1>
+                    <p className="text-lg text-gray-300 mb-6">
+                        Log in to manage your playlists and enjoy a personalized music experience.
+                    </p>
+                    <div className="flex justify-center gap-4">
+                        <a
+                            href="/auth"
+                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                        >
+                            Login
+                        </a>
+                        <a
+                            href="/auth"
+                            className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+                        >
+                            Sign Up
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black text-white flex flex-col items-center px-6 py-10">
-            {isAuthenticated ? (
+        <div className=" text-white flex flex-col items-center px-6 py-10">
+            {isAuthenticated && (
                 <div className="w-full max-w-5xl">
                     {/* Header */}
                     <div className="flex justify-between items-center mb-6">
@@ -185,27 +211,6 @@ export default function Playlists() {
                                 You don't have any playlists yet.
                             </p>
                         )}
-                    </div>
-                </div>
-            ) : (
-                <div className="max-w-md text-center bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg">
-                    <h1 className="text-4xl font-bold mb-4">Limited Access</h1>
-                    <p className="text-lg text-gray-300 mb-6">
-                        Log in to manage your playlists and enjoy a personalized music experience.
-                    </p>
-                    <div className="flex justify-center gap-4">
-                        <a
-                            href="/auth"
-                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
-                        >
-                            Login
-                        </a>
-                        <a
-                            href="/auth"
-                            className="bg-gray-700 hover:bg-gray-600 text-white py-2 px-4 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
-                        >
-                            Sign Up
-                        </a>
                     </div>
                 </div>
             )}
