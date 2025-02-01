@@ -419,3 +419,62 @@ export async function addTrackFavorite(req: Request, res: Response): Promise<voi
         res.status(500).json({ message: "Erreur serveur lors de l'ajout de la chanson aux favoris." });
     }
 }
+
+export async function deleteTrackFavorite(req: Request, res: Response): Promise<void> {
+    const { idTrack, userId } = req.body;
+
+    // Vérification des entrées
+    if (!idTrack || typeof idTrack !== "string") {
+        res.status(400).json({ message: "L'identifiant de la piste est invalide." });
+        return;
+    }
+
+    if (!userId || typeof userId !== "string") {
+        res.status(400).json({ message: "L'identifiant de l'utilisateur est invalide ou manquant." });
+        return;
+    }
+
+    try {
+        // Récupérer la liste de favoris de l'utilisateur
+        const userFavorites = await prisma.favorites.findUnique({
+            where: {
+                userId: userId,
+            },
+            include: {
+                tracks: true,
+            },
+        });
+
+        if (!userFavorites) {
+            res.status(404).json({ message: "Aucune liste de favoris trouvée pour cet utilisateur." });
+            return;
+        }
+
+        // Vérifier si la chanson est dans les favoris
+        const trackExistsInFavorites = userFavorites.tracks.find(track => track.idTrackDeezer === idTrack);
+
+        if (!trackExistsInFavorites) {
+            res.status(404).json({ message: "Cette chanson n'est pas dans les favoris." });
+            return;
+        }
+
+        // Supprimer la chanson des favoris
+        await prisma.favorites.update({
+            where: {
+                userId: userId,
+            },
+            data: {
+                tracks: {
+                    disconnect: {
+                        idTrack: trackExistsInFavorites.idTrack,
+                    },
+                },
+            },
+        });
+
+        res.status(200).json({ message: "La chanson a été supprimée des favoris avec succès." });
+    } catch (error) {
+        console.error("Erreur lors de la suppression de la chanson des favoris:", error);
+        res.status(500).json({ message: "Erreur serveur lors de la suppression de la chanson des favoris." });
+    }
+}
