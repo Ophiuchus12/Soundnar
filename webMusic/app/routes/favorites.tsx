@@ -104,7 +104,7 @@ export default function Favorites() {
                 <div className="max-w-md text-center bg-white/10 backdrop-blur-lg p-6 rounded-lg shadow-lg">
                     <h1 className="text-4xl text-white font-bold mb-4">Limited Access</h1>
                     <p className="text-lg text-gray-300 mb-6">
-                        Log in to manage your playlists and enjoy a personalized music experience.
+                        Log in to manage your favorites and enjoy a personalized music experience.
                     </p>
                     <div className="flex justify-center gap-4">
                         <a
