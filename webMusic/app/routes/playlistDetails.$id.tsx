@@ -1,11 +1,11 @@
 import { LoaderFunction } from '@remix-run/node'
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
-import { CiCirclePlus } from 'react-icons/ci';
+import { CiHeart } from 'react-icons/ci';
 import { FaArrowLeft, FaTrash } from 'react-icons/fa';
 import { GiMusicSpell } from 'react-icons/gi';
 import { getTrackById } from '~/lib/Music';
-import { addTrackFavorite, deleteTrackPlaylist, formatTime, getPlaylistById } from '~/lib/Playlist';
+import { addTrackFavorite, deleteTrackfavorite, deleteTrackPlaylist, formatTime, getFavoritePlaylist, getPlaylistById } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server'
 import { getOneTrackData, PlaylistPerso, TrackPerso } from '~/types';
@@ -50,9 +50,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
         isAuthenticated: true, error: "Playlist not found", token, userId, playlist: null,
       };
     }
+    const favorites = await getFavoritePlaylist(userId);
+    const idFavoriteTracks = favorites?.favorites.map(fav => fav.idTrackDeezer) || [];
 
     return {
-      isAuthenticated: true, error: null, token, userId, playlist,
+      isAuthenticated: true, error: null, token, userId, idFavoriteTracks: idFavoriteTracks, playlist,
     };
   } catch (error) {
     console.error("An unexpected error occurred:", error);
@@ -67,10 +69,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 };
 export default function PlaylistDetails() {
 
-  const { isAuthenticated, token, userId, playlist, error } = useLoaderData<{
+  const { isAuthenticated, token, userId, idFavoriteTracks, playlist, error } = useLoaderData<{
     isAuthenticated: boolean;
     token: string | null;
     userId: string | null;
+    idFavoriteTracks: string[];
     playlist: PlaylistPerso | null;
     error: string | null;
   }>();
@@ -92,6 +95,27 @@ export default function PlaylistDetails() {
       await addTrackFavorite(userId, idTrack);
       console.log("Track added to favorites successfully!");
       setIdFav(null);
+      idFavoriteTracks.push(idTrack);
+    } catch (error) {
+      console.error("Error adding track to favorites:", error);
+    }
+  };
+
+  const removeFavorite = async () => {
+    if (!idFav || !userId) {
+      // Si idFav ou userId sont absents, on ne fait rien
+      return;
+    }
+
+    try {
+      const idTrack = idFav.toString();
+      await deleteTrackfavorite(userId, idTrack);
+      console.log("Track removed to favorites successfully!");
+      setIdFav(null);
+      const index = idFavoriteTracks.indexOf(idTrack);
+      if (index > -1) {
+        idFavoriteTracks.splice(index, 1); // Remove the track from the array
+      }
     } catch (error) {
       console.error("Error adding track to favorites:", error);
     }
@@ -177,18 +201,22 @@ export default function PlaylistDetails() {
                   >
                     {/* Image de couverture */}
                     <button
-                      onClick={() => setIdFav(track.id)} // Ajouter aux favoris
-                      className="rounded-full p-2 mr-3 transition-all bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                      onClick={() => setIdFav(track.id)}
+                      className={`rounded-full p-2 transition-all 
+                          ${idFavoriteTracks.includes((track.id).toString())
+                          ? "bg-red-600 text-white"  // ❤️ Si favori, icône rouge
+                          : "bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                        }`}
                       aria-label="Add to Favorites"
                     >
-                      <CiCirclePlus className="w-6 h-6 text-white" />
+                      <CiHeart className="w-6 h-6" />
                     </button>
 
                     {/* Thumbnail */}
                     <img
                       src={`https://e-cdns-images.dzcdn.net/images/cover/${track.md5_image}/250x250-000000-80-0-0.jpg`}
                       alt={track.title}
-                      className="w-16 h-16 object-cover rounded-lg"
+                      className="w-16 h-16 object-cover rounded-lg ml-3"
                     />
 
                     {/* Infos du morceau */}
@@ -242,16 +270,25 @@ export default function PlaylistDetails() {
           {idFav && (
             <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">
               <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md transform transition-transform duration-300 ease-in-out scale-95 hover:scale-100">
-                <h2 className="text-2xl font-semibold text-white mb-6">Add to favorite ?</h2>
+                <h2 className="text-2xl font-semibold text-white mb-6">Your favorites ?</h2>
 
                 <div className="flex justify-between items-center mt-6">
-                  <button
-                    type="button"
-                    className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
-                    onClick={addFavorite}
-                  >
-                    Add to favorite
-                  </button>
+                  {idFavoriteTracks.includes((idFav).toString()) ?
+                    <button
+                      type="button"
+                      className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                      onClick={removeFavorite}
+                    >
+                      Remove from favorite
+                    </button> :
+                    <button
+                      type="button"
+                      className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                      onClick={addFavorite}
+                    >
+                      Add to favorite
+                    </button>
+                  }
 
                   <div className="w-4" />
 
