@@ -10,8 +10,8 @@ import { commitSession, getSession } from "~/session.server";
 import { getMe, verify } from "~/lib/User";
 import { PiMusicNotesPlus } from "react-icons/pi";
 import AddMenu from "~/components/addMenu";
-import { addTrackFavorite, getAllPlaylists } from "~/lib/Playlist";
-import { CiCirclePlus } from "react-icons/ci";
+import { addTrackFavorite, deleteTrackfavorite, getAllPlaylists, getFavoritePlaylist } from "~/lib/Playlist";
+import { CiHeart } from "react-icons/ci";
 
 export const loader: LoaderFunction = async ({ request }) => {
   // Handle session and authentication
@@ -40,6 +40,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     }
   }
   const playlists = await getAllPlaylists(userId);
+  const favorites = await getFavoritePlaylist(userId);
+  const idFavoriteTracks = favorites?.favorites.map(fav => fav.idTrackDeezer) || [];
+
 
   //console.log("nom", userName);
 
@@ -64,6 +67,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         error,
         userName,
         userId,
+        idFavoriteTracks,
         playlists,
         albums: chartAlbum.data,
         artists: chartArtist.data,
@@ -86,6 +90,7 @@ export const loader: LoaderFunction = async ({ request }) => {
         token,
         userName,
         userId,
+        idFavoriteTracks,
         playlists,
         error: error,
         albums: [],
@@ -126,7 +131,7 @@ export const action: ActionFunction = async ({ request }) => {
 
 
 export default function Index() {
-  const { albums, artists, tracks, genres, isAuthenticated, token, userName, userId, error, playlists } = useLoaderData<{
+  const { albums, artists, tracks, genres, isAuthenticated, token, userName, userId, idFavoriteTracks, error, playlists } = useLoaderData<{
     albums: Album[];
     artists: Artist[];
     tracks: Track[];
@@ -136,6 +141,7 @@ export default function Index() {
     token: string | null;
     userName: string | null;
     userId: string;
+    idFavoriteTracks: string[];
     error: string | null;
   }>();
 
@@ -198,6 +204,24 @@ export default function Index() {
       await addTrackFavorite(userId, idTrack);
       console.log("Track added to favorites successfully!");
       setIdFav(null);
+      navigate(`/`);
+    } catch (error) {
+      console.error("Error adding track to favorites:", error);
+    }
+  };
+
+  const removeFavorite = async () => {
+    if (!idFav || !userId) {
+      // Si idFav ou userId sont absents, on ne fait rien
+      return;
+    }
+
+    try {
+      const idTrack = idFav.toString();
+      await deleteTrackfavorite(userId, idTrack);
+      console.log("Track removed to favorites successfully!");
+      setIdFav(null);
+      navigate(`/`);
     } catch (error) {
       console.error("Error adding track to favorites:", error);
     }
@@ -279,19 +303,25 @@ export default function Index() {
                       className="flex items-center bg-gray-900 p-4 rounded-lg hover:bg-gray-700 transition cursor-pointer"
                     >
                       {/* Bouton + avant l'image */}
-                      <button
-                        onClick={() => setIdFav(track.id)} // Ajouter aux favoris
-                        className="rounded-full p-2 mr-3 transition-all bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
-                        aria-label="Add to Favorites"
-                      >
-                        <CiCirclePlus className="w-6 h-6 text-white" />
-                      </button>
+                      {isAuthenticated && (
+                        <button
+                          onClick={() => setIdFav(track.id)}
+                          className={`rounded-full p-2 transition-all 
+                                                                ${idFavoriteTracks.includes((track.id).toString())
+                              ? "bg-red-600 text-white"  // ❤️ Si favori, icône rouge
+                              : "bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                            }`}
+                          aria-label="Add to Favorites"
+                        >
+                          <CiHeart className="w-6 h-6" />
+                        </button>
+                      )}
 
                       {/* Thumbnail */}
                       <img
                         src={`https://e-cdns-images.dzcdn.net/images/cover/${track.md5_image}/250x250-000000-80-0-0.jpg`}
                         alt={track.title}
-                        className="w-16 h-16 object-cover rounded-lg"
+                        className="w-16 h-16 object-cover rounded-lg ml-3"
                       />
 
                       {/* Details */}
@@ -473,18 +503,23 @@ export default function Index() {
                       {/* Overlay foncé au hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-                      <div className="absolute top-2 left-2 right-2 flex justify-between">
-                        {/* Bouton "Add to Favorites" */}
-                        <button
-                          onClick={() => setIdFav(track.id)}
-                          className="rounded-full p-2 transition-all bg-gray-800 text-gray-400 hover:bg-purple-600 hover:text-white"
-                          aria-label="Add to Favorites"
-                        >
-                          <CiCirclePlus className="w-6 h-6 text-white" />
-                        </button>
+                      {isAuthenticated && (
+                        <div className="absolute top-2 left-2 right-2 flex justify-between">
+                          {/* Bouton "Add to Favorites" */}
+                          <button
+                            onClick={() => setIdFav(track.id)}
+                            className={`rounded-full p-2 transition-all 
+                                                                  ${idFavoriteTracks.includes((track.id).toString())
+                                ? "bg-red-600 text-white"  // ❤️ Si favori, icône rouge
+                                : "bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                              }`}
+                            aria-label="Add to Favorites"
+                          >
+                            <CiHeart className="w-6 h-6" />
+                          </button>
 
-                        {/* Bouton "Add to Playlist" */}
-                        {isAuthenticated && (
+
+
                           <button
                             onClick={() => toggleAddMenu(track.id)}
                             className="p-2 rounded-full bg-gray-800 hover:bg-purple-600 text-gray-400 hover:text-white transition-all shadow-md "
@@ -492,8 +527,9 @@ export default function Index() {
                           >
                             <PiMusicNotesPlus className="h-6 w-6 text-white" />
                           </button>
-                        )}
-                      </div>
+
+                        </div>
+                      )}
                     </div>
 
                     {/* Infos de la track */}
@@ -537,13 +573,22 @@ export default function Index() {
               <h2 className="text-2xl font-semibold text-white mb-6">Add to favorite ?</h2>
 
               <div className="flex justify-between items-center mt-6">
-                <button
-                  type="button"
-                  className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
-                  onClick={addFavorite}
-                >
-                  Add to favorite
-                </button>
+                {idFavoriteTracks.includes((idFav).toString()) ?
+                  <button
+                    type="button"
+                    className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                    onClick={removeFavorite}
+                  >
+                    Remove from favorite
+                  </button> :
+                  <button
+                    type="button"
+                    className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                    onClick={addFavorite}
+                  >
+                    Add to favorite
+                  </button>
+                }
 
                 <div className="w-4" />
 

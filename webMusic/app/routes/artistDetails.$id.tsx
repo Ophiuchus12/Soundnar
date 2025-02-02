@@ -1,13 +1,13 @@
 import { LoaderFunction, LoaderFunctionArgs } from '@remix-run/node'
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
-import { CiCirclePlus } from 'react-icons/ci';
+import { CiHeart } from 'react-icons/ci';
 import { FaArrowLeft } from 'react-icons/fa';
 import { GiMusicSpell } from 'react-icons/gi';
 import { PiMusicNotesPlus } from 'react-icons/pi';
 import AddMenu from '~/components/addMenu';
 import { getArtist, getArtistAlbums, getArtistTopSong } from '~/lib/Music';
-import { addTrackFavorite, getAllPlaylists } from '~/lib/Playlist';
+import { addTrackFavorite, deleteTrackfavorite, getAllPlaylists, getFavoritePlaylist } from '~/lib/Playlist';
 import { getMe, verify } from '~/lib/User';
 import { getSession } from '~/session.server';
 import { ArtistDetail, ArtistDetailAlbumList, ArtistTopSongList, PlaylistPerso } from '~/types';
@@ -55,23 +55,25 @@ export async function loader({ params, request }: LoaderFunctionArgs) {
     }
     //console.log("user", userId);
     const playlists = await getAllPlaylists(userId);
+    const favorites = await getFavoritePlaylist(userId);
+    const idFavoriteTracks = favorites?.favorites.map(fav => fav.idTrackDeezer) || [];
 
 
-
-    return { artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong, isAuthenticated: true, error: null, token: token, userId: userId, playlists: playlists }
+    return { artistData: artistData, artistDataAlbums: artistDataAlbums, topArtistDataSong: topArtistDataSong, isAuthenticated: true, error: null, token: token, userId: userId, idFavoriteTracks: idFavoriteTracks, playlists: playlists }
 
 }
 
 
 export default function ArtistDetails() {
 
-    const { artistData, artistDataAlbums, topArtistDataSong, isAuthenticated, token, userId, error, playlists } = useLoaderData<{
+    const { artistData, artistDataAlbums, topArtistDataSong, isAuthenticated, token, userId, idFavoriteTracks, error, playlists } = useLoaderData<{
         artistData: ArtistDetail;
         artistDataAlbums: ArtistDetailAlbumList;
         topArtistDataSong: ArtistTopSongList;
         isAuthenticated: boolean;
         token: string | null;
         userId: string | null;
+        idFavoriteTracks: string[];
         playlists: PlaylistPerso[];
         error: string | null;
     }>();
@@ -92,6 +94,24 @@ export default function ArtistDetails() {
             await addTrackFavorite(userId, idTrack);
             console.log("Track added to favorites successfully!");
             setIdFav(null);
+            navigate(`/artistDetails/${artistData.id}`)
+        } catch (error) {
+            console.error("Error adding track to favorites:", error);
+        }
+    };
+
+    const removeFavorite = async () => {
+        if (!idFav || !userId) {
+            // Si idFav ou userId sont absents, on ne fait rien
+            return;
+        }
+
+        try {
+            const idTrack = idFav.toString();
+            await deleteTrackfavorite(userId, idTrack);
+            console.log("Track removed to favorites successfully!");
+            setIdFav(null);
+            navigate(`/artistDetails/${artistData.id}`)
         } catch (error) {
             console.error("Error adding track to favorites:", error);
         }
@@ -175,13 +195,19 @@ export default function ArtistDetails() {
                             <div key={track.id} className="flex items-center justify-between p-4 bg-gray-700 rounded-lg mb-4 hover:bg-gray-600">
                                 <div className="flex items-center space-x-4">
                                     {/* Bouton Play/Stop */}
-                                    <button
-                                        onClick={() => setIdFav(track.id)}
-                                        className="rounded-full p-2 transition-all bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
-                                        aria-label="Add to Favorites"
-                                    >
-                                        <CiCirclePlus className="w-6 h-6 text-white" />
-                                    </button>
+                                    {isAuthenticated && (
+                                        <button
+                                            onClick={() => setIdFav(track.id)}
+                                            className={`rounded-full p-2 transition-all 
+                                                                                ${idFavoriteTracks.includes((track.id).toString())
+                                                    ? "bg-red-600 text-white"  // ❤️ Si favori, icône rouge
+                                                    : "bg-gray-800 text-gray-400 hover:bg-purple-900/50 hover:text-white"
+                                                }`}
+                                            aria-label="Add to Favorites"
+                                        >
+                                            <CiHeart className="w-6 h-6" />
+                                        </button>
+                                    )}
 
                                     {/* Informations sur la piste */}
                                     <div className="flex flex-col">
@@ -241,13 +267,22 @@ export default function ArtistDetails() {
                                 <h2 className="text-2xl font-semibold text-white mb-6">Add to favorite ?</h2>
 
                                 <div className="flex justify-between items-center mt-6">
-                                    <button
-                                        type="button"
-                                        className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
-                                        onClick={addFavorite}
-                                    >
-                                        Add to favorite
-                                    </button>
+                                    {idFavoriteTracks.includes((idFav).toString()) ?
+                                        <button
+                                            type="button"
+                                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                                            onClick={removeFavorite}
+                                        >
+                                            Remove from favorite
+                                        </button> :
+                                        <button
+                                            type="button"
+                                            className="bg-[#7600be] hover:bg-[#8c00c8] text-white py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 w-full sm:w-auto"
+                                            onClick={addFavorite}
+                                        >
+                                            Add to favorite
+                                        </button>
+                                    }
 
                                     <div className="w-4" />
 
