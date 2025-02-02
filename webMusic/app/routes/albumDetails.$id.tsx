@@ -106,7 +106,7 @@ export default function AlbumDetails() {
             await addTrackFavorite(userId, idTrack);
             console.log("Track added to favorites successfully!");
             setIdFav(null);
-            navigate(`/albumDetails/${albumData.id}`)
+            idFavoriteTracks.push(idTrack);
         } catch (error) {
             console.error("Error adding track to favorites:", error);
         }
@@ -123,7 +123,10 @@ export default function AlbumDetails() {
             await deleteTrackfavorite(userId, idTrack);
             console.log("Track removed to favorites successfully!");
             setIdFav(null);
-            navigate(`/albumDetails/${albumData.id}`)
+            const index = idFavoriteTracks.indexOf(idTrack);
+            if (index > -1) {
+                idFavoriteTracks.splice(index, 1); // Remove the track from the array
+            }
         } catch (error) {
             console.error("Error adding track to favorites:", error);
         }
@@ -309,7 +312,7 @@ export default function AlbumDetails() {
             {idFav && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 transition-opacity duration-300 ease-in-out opacity-100">
                     <div className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md transform transition-transform duration-300 ease-in-out scale-95 hover:scale-100">
-                        <h2 className="text-2xl font-semibold text-white mb-6">Add to favorite ?</h2>
+                        <h2 className="text-2xl font-semibold text-white mb-6">Your favorites ?</h2>
 
                         <div className="flex justify-between items-center mt-6">
                             {idFavoriteTracks.includes((idFav).toString()) ?
