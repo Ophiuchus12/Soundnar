@@ -8,7 +8,11 @@ const app = express();
 const PORT = 3000;
 
 // Activer CORS pour toutes les origines (si vous souhaitez autoriser tous les domaines)
-app.use(cors());
+app.use(cors({
+    origin: "*", // Permet toutes les origines (à restreindre en prod)
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders: "Content-Type, Authorization"
+}));
 
 // Vous pouvez également configurer CORS pour autoriser uniquement votre frontend
 // Exemple : app.use(cors({ origin: 'http://localhost:3001' }));

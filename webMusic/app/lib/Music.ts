@@ -19,7 +19,10 @@ import {
     getOneTrackData
 } from "~/types";
 
-const url = "http://localhost:3000"
+//const url = "http://localhost:3000"
+//const url = "http://46.202.134.250:3000"
+const url = "https://www.api.soundnarmusic.fr"
+
 
 /*recuperation top 10 albums actu */
 export async function getChartAlbums(): Promise<ChartResponseAlbums | null> {

@@ -1,6 +1,9 @@
 import { UserResponse } from "~/types"
 
-const url = "http://localhost:3000"
+//const url = "http://localhost:3000"
+//const url = "http://46.202.134.250:3000"
+const url = "https://www.api.soundnarmusic.fr"
+
 
 export async function login(username: string, password: string): Promise<UserResponse | null> {
     const URL = `${url}/api/user/login`;
