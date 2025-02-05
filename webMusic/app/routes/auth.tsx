@@ -289,15 +289,16 @@ export default function Auth() {
                     {/* Additional Options */}
                     <div className="text-center mt-4">
                         <p className="text-sm text-gray-500">
-                            Don’t have an account?{" "}
+                            {activeTab === "signup" ? "Already have an account?" : "Don’t have an account?"}{" "}
                             <button
                                 onClick={() => handleSwitchTab(activeTab === "signup" ? "login" : "signup")}
                                 className="text-purple-400 hover:underline"
                             >
-                                Sign up
+                                {activeTab === "signup" ? "Sign in" : "Sign up"}
                             </button>
                         </p>
                     </div>
+
                 </div>
             </div>
 
