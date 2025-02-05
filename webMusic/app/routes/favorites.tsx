@@ -1,4 +1,4 @@
-import { LoaderFunction } from '@remix-run/node';
+import { LoaderFunction, redirect } from '@remix-run/node';
 import { useLoaderData, useNavigate } from '@remix-run/react';
 import React, { useEffect, useState } from 'react'
 import { FaTrash } from 'react-icons/fa';
@@ -89,8 +89,7 @@ export default function Favorites() {
             const IdTrackString = idTrack.toString();
             const handleDelete = await deleteTrackfavorite(userId, IdTrackString);
             if (handleDelete) {
-
-                navigate(`/favorites`);
+                redirect(`/favorites`);
             }
         } catch (err) {
             console.error("Erreur lors de la suppression de la playlist :", err);
@@ -132,9 +131,7 @@ export default function Favorites() {
                     🎵 Your Favorite Tracks, {userName}
                 </h1>
 
-                {loading ? (
-                    <p className="text-lg text-gray-400 text-center">Loading your favorite tracks...</p>
-                ) : fav.length === 0 ? (
+                {fav.length === 0 ? (
                     <p className="text-lg text-gray-400 text-center">You haven't added any favorite tracks yet.</p>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
