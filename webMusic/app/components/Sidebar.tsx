@@ -23,7 +23,7 @@ export default function Sidebar() {
             <div className="flex justify-center mb-2">
                 <img
                     className="w-45 h-25 rounded-lg drop-shadow-[0_0_10px_rgba(168,85,247,0.4)]"
-                    src="../assets/logo.png"
+                    src="../logo.png"
                     alt="Logo"
                 />
             </div>
